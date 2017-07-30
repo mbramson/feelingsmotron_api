@@ -1,0 +1,16 @@
+defmodule Feelingsmotron.Repo.Migrations.CreateFeelingsmotron.Account.UserToken do
+  use Ecto.Migration
+
+  def change do
+    create table(:user_tokens) do
+      add :user_id, references(:account_users, on_delete: :delete_all)
+      add :token, :string, null: false
+      add :type, :string, null: false
+
+      timestamps()
+    end
+
+    create unique_index(:user_tokens, [:token])
+    create unique_index(:user_tokens, [:user_id, :type])
+  end
+end
