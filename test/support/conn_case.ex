@@ -20,6 +20,7 @@ defmodule Feelingsmotron.Web.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
       import Feelingsmotron.Web.Router.Helpers
+      import Feelingsmotron.Factory
 
       # The default endpoint for testing
       @endpoint Feelingsmotron.Web.Endpoint

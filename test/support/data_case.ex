@@ -22,6 +22,7 @@ defmodule Feelingsmotron.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Feelingsmotron.DataCase
+      import Feelingsmotron.Factory
     end
   end
 
