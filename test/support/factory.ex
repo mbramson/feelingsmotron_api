@@ -12,8 +12,8 @@ defmodule Feelingsmotron.Factory do
   def user_token_factory do
     %Feelingsmotron.Account.UserToken{
       token: sequence(:token_string, &"user-token-string-#{&1}"),
-      type: 'confirmation',
-      user: build(:user)
+      type: "email_confirmation",
+      user: build(:user),
     }
   end
 end

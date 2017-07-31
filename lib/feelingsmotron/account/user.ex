@@ -3,7 +3,6 @@ defmodule Feelingsmotron.Account.User do
   import Ecto.Changeset
   alias Feelingsmotron.Account.User
 
-
   schema "account_users" do
     field :email, :string
     field :name, :string
