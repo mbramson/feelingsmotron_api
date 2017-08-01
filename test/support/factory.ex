@@ -12,7 +12,7 @@ defmodule Feelingsmotron.Factory do
   def user_token_factory do
     %Feelingsmotron.Account.UserToken{
       token: sequence(:token_string, &"user-token-string-#{&1}"),
-      type: "email_confirmation",
+      type: "password_reset",
       user: build(:user),
     }
   end

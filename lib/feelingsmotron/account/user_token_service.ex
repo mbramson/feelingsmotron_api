@@ -87,7 +87,7 @@ defmodule Feelingsmotron.Account.UserTokenService do
   end
 
   @spec user_token_by_token_string(String.t, user_token_types) :: Ecto.Query.t
-  def user_token_by_token_string(token_string, token_type) do
+  defp user_token_by_token_string(token_string, token_type) do
     from user_token in UserToken,
     join: user in assoc(user_token, :user),
     where: user_token.token == ^token_string,

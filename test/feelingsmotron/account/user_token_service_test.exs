@@ -1,7 +1,6 @@
 defmodule Feelingsmotron.Account.UserTokenServiceTest do
   use Feelingsmotron.DataCase
 
-  alias Feelingsmotron.Account
   alias Feelingsmotron.Account.UserTokenService
 
   describe "generate_token/2" do

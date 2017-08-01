@@ -23,4 +23,12 @@ defmodule Feelingsmotron.Web.FallbackController do
     |> put_status(:unauthorized)
     |> render(Feelingsmotron.Web.ErrorView, :"401_invalid_credentials")
   end
+
+  def call(conn, fallback_data) do
+    IO.puts "FallbackController invoked with unhandled data. Please explicitly handle this."
+    IO.inspect fallback_data
+    conn
+    |> put_status(:internal_server_error)
+    |> render(Feelingsmotron.Web.ErrorView, :"500")
+  end
 end
