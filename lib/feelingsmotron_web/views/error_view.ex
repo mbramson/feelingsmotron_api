@@ -1,6 +1,10 @@
 defmodule FeelingsmotronWeb.ErrorView do
   use FeelingsmotronWeb, :view
 
+  def render("400.json", _assigns) do
+    %{errors: %{detail: "Invalid Request"}}
+  end
+
   def render("401_invalid_credentials.json", _assigns) do
     %{errors: %{detail: "Invalid credentials"}}
   end
