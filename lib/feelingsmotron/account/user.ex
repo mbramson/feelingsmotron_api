@@ -20,6 +20,7 @@ defmodule Feelingsmotron.Account.User do
     |> cast(attrs, [:name, :email, :password])
     |> validate_required([:name, :email, :password])
     |> hash_password
+    |> unique_constraint(:email)
   end
 
   @spec hash_password(%Ecto.Changeset{}) :: %Ecto.Changeset{}
