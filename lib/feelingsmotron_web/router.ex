@@ -20,13 +20,14 @@ defmodule FeelingsmotronWeb.Router do
       post "/password_reset", PasswordResetController, :create
       get "/password_reset", PasswordResetController, :show
       put "/password_reset", PasswordResetController, :update
-      get "/feelings", FeelingsController, :show
-      put "/feelings", FeelingsController, :update
     end
 
     scope "/v1" do
       pipe_through :api_auth
 
+      get "/feelings", FeelingsController, :show
+      post "/feelings", FeelingsController, :create
+      put "/feelings", FeelingsController, :update
     end
   end
 end
