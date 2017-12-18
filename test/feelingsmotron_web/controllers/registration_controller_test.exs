@@ -27,7 +27,7 @@ defmodule FeelingsmotronWeb.RegistrationControllerTest do
     email = @create_attrs[:email]
     insert(:user, %{email: email})
     conn = post conn, registration_path(conn, :create), user: @create_attrs
-    assert response = json_response(conn, 409)
+    assert json_response(conn, 409)
   end
 
   test "does not create user and renders errors when data is invalid", %{conn: conn} do

@@ -6,11 +6,13 @@ defmodule Feelingsmotron.FeelingsTest do
   describe "feelings" do
     alias Feelingsmotron.Feelings.Feeling
 
-    @valid_attrs %{value: 42}
-    @update_attrs %{value: 43}
+    @valid_attrs %{value: 3}
+    @update_attrs %{value: 4}
     @invalid_attrs %{value: nil}
 
     def feeling_fixture(attrs \\ %{}) do
+      user = insert(:user)
+      attrs = Map.merge(attrs, %{user_id: user.id})
       {:ok, feeling} =
         attrs
         |> Enum.into(@valid_attrs)
@@ -30,8 +32,12 @@ defmodule Feelingsmotron.FeelingsTest do
     end
 
     test "create_feeling/1 with valid data creates a feeling" do
-      assert {:ok, %Feeling{} = feeling} = Feelings.create_feeling(@valid_attrs)
-      assert feeling.value == 42
+      user = insert(:user)
+      attrs = Map.merge(@valid_attrs, %{user_id: user.id})
+
+      assert {:ok, %Feeling{} = feeling} = Feelings.create_feeling(attrs)
+      assert feeling.value == 3
+      assert feeling.user_id == user.id
     end
 
     test "create_feeling/1 with invalid data returns error changeset" do
@@ -42,7 +48,7 @@ defmodule Feelingsmotron.FeelingsTest do
       feeling = feeling_fixture()
       assert {:ok, feeling} = Feelings.update_feeling(feeling, @update_attrs)
       assert %Feeling{} = feeling
-      assert feeling.value == 43
+      assert feeling.value == 4
     end
 
     test "update_feeling/2 with invalid data returns error changeset" do
@@ -55,11 +61,6 @@ defmodule Feelingsmotron.FeelingsTest do
       feeling = feeling_fixture()
       assert {:ok, %Feeling{}} = Feelings.delete_feeling(feeling)
       assert_raise Ecto.NoResultsError, fn -> Feelings.get_feeling!(feeling.id) end
-    end
-
-    test "change_feeling/1 returns a feeling changeset" do
-      feeling = feeling_fixture()
-      assert %Ecto.Changeset{} = Feelings.change_feeling(feeling)
     end
   end
 end
