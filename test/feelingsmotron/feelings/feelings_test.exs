@@ -44,6 +44,19 @@ defmodule Feelingsmotron.FeelingsTest do
       assert {:error, %Ecto.Changeset{}} = Feelings.create_feeling(@invalid_attrs)
     end
 
+    test "create_feeling/1 with invalid feeling values returns error changeset" do
+      user = insert(:user)
+
+      invalid_attrs = %{value: 0, user_id: user.id}
+      assert {:error, %Ecto.Changeset{}} = Feelings.create_feeling(invalid_attrs)
+
+      invalid_attrs = %{value: 6, user_id: user.id}
+      assert {:error, %Ecto.Changeset{}} = Feelings.create_feeling(invalid_attrs)
+
+      invalid_attrs = %{value: "cats", user_id: user.id}
+      assert {:error, %Ecto.Changeset{}} = Feelings.create_feeling(invalid_attrs)
+    end
+
     test "update_feeling/2 with valid data updates the feeling" do
       feeling = feeling_fixture()
       assert {:ok, feeling} = Feelings.update_feeling(feeling, @update_attrs)

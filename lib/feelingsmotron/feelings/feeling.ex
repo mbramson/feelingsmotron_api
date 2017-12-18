@@ -16,5 +16,17 @@ defmodule Feelingsmotron.Feelings.Feeling do
     feeling
     |> cast(attrs, [:value, :user_id])
     |> validate_required([:value, :user_id])
+    |> validate_value
+  end
+
+  defp validate_value(changeset) do
+    validate_change changeset, :value, fn _field, value ->
+      cond do
+        not is_integer(value) -> [{:value, "value must be an integer"}]
+        value < 1 -> [{:value, "value must be greater than zero"}]
+        value > 5 -> [{:value, "value must be less than six"}]
+        value -> []
+      end
+    end
   end
 end
