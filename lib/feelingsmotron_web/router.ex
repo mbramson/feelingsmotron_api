@@ -27,7 +27,6 @@ defmodule FeelingsmotronWeb.Router do
 
       get "/feelings", FeelingsController, :show
       post "/feelings", FeelingsController, :create
-      put "/feelings", FeelingsController, :update
     end
   end
 end
