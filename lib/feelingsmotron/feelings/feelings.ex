@@ -88,4 +88,12 @@ defmodule Feelingsmotron.Feelings do
   def delete_feeling(%Feeling{} = feeling) do
     Repo.delete(feeling)
   end
+
+  def last_feeling(user) do
+    query = from f in Feeling,
+      where: f.user_id == ^user.id,
+      order_by: [desc: f.inserted_at],
+      limit: 1
+    Repo.one(query)
+  end
 end

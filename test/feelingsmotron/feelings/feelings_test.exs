@@ -75,5 +75,25 @@ defmodule Feelingsmotron.FeelingsTest do
       assert {:ok, %Feeling{}} = Feelings.delete_feeling(feeling)
       assert_raise Ecto.NoResultsError, fn -> Feelings.get_feeling!(feeling.id) end
     end
+
+    test "last_feeling/0 returns nil if there was no previous feeling" do
+      user = insert(:user)
+      assert nil == Feelings.last_feeling(user)
+    end
+
+    test "last_feeling/0 returns a feeling if it exists" do
+      user = insert(:user)
+      feeling = insert(:feeling, %{user: user})
+      returned_feeling = Feelings.last_feeling(user)
+      assert feeling.id == returned_feeling.id
+    end
+
+    test "last_feeling/0 returns only the last feeling to be inserted" do
+      user = insert(:user)
+      insert(:feeling, %{user: user})
+      feeling2 = insert(:feeling, %{user: user})
+      returned_feeling = Feelings.last_feeling(user)
+      assert feeling2.id == returned_feeling.id
+    end
   end
 end

@@ -5,7 +5,7 @@ defmodule Feelingsmotron.Factory do
     %Feelingsmotron.Account.User{
       name: sequence(:name, &"user-#{&1}"),
       email: sequence(:email, &"email-#{&1}@example.com"),
-      password_hash: "password_hash"
+      password_hash: "password_hash",
     }
   end
 
@@ -13,6 +13,13 @@ defmodule Feelingsmotron.Factory do
     %Feelingsmotron.Account.UserToken{
       token: sequence(:token_string, &"user-token-string-#{&1}"),
       type: "password_reset",
+      user: build(:user),
+    }
+  end
+
+  def feeling_factory do
+    %Feelingsmotron.Feelings.Feeling{
+      value: 1,
       user: build(:user),
     }
   end
