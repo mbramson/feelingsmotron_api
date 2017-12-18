@@ -89,6 +89,9 @@ defmodule Feelingsmotron.Feelings do
     Repo.delete(feeling)
   end
 
+  @doc """
+  Returns the last feeling created for the given user.
+  """
   def last_feeling(user) do
     query = from f in Feeling,
       where: f.user_id == ^user.id,
