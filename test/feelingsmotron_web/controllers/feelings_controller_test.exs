@@ -1,6 +1,8 @@
 defmodule FeelingsmotronWeb.FeelingsControllerTest do
   use FeelingsmotronWeb.ConnCase
 
+  alias Feelingsmotron.Feelings
+
   describe "show" do
     test "returns no feeling if none exists" do
       {conn, _user} = conn_with_authenticated_user()
@@ -34,11 +36,42 @@ defmodule FeelingsmotronWeb.FeelingsControllerTest do
 
       conn = get conn, feelings_path(conn, :show)
       assert %{"feelings" => 2} = json_response(conn, 200)
-
     end
   end
 
   describe "create" do
+    test "adds a new feeling" do
+      {conn, user} = conn_with_authenticated_user()
+      post conn, feelings_path(conn, :create), %{feelings: 1}
 
+      assert [feeling | []] = Feelings.list_feelings
+      assert feeling.user_id == user.id
+    end
+
+    test "errors when given an invalid feeling" do
+      {conn, _user} = conn_with_authenticated_user()
+      conn = post conn, feelings_path(conn, :create), %{feelings: 0}
+      assert json_response(conn, 422)
+
+      {conn, _user} = conn_with_authenticated_user()
+      conn = post conn, feelings_path(conn, :create), %{feelings: 6}
+      assert json_response(conn, 422)
+
+      {conn, _user} = conn_with_authenticated_user()
+      conn = post conn, feelings_path(conn, :create), %{feelings: "cats"}
+      assert json_response(conn, 422)
+    end
+  end
+
+  describe "non-authenticated requests" do
+    test "non-authenticated :show returns 403", %{conn: conn} do
+      conn = post conn, feelings_path(conn, :create), %{feelings: 1}
+      assert text_response(conn, 403)
+    end
+
+    test "non-authenticated :create returns 403", %{conn: conn} do
+      conn = post conn, feelings_path(conn, :create), %{feelings: 1}
+      assert text_response(conn, 403)
+    end
   end
 end
