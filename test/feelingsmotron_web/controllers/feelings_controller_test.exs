@@ -65,7 +65,7 @@ defmodule FeelingsmotronWeb.FeelingsControllerTest do
 
   describe "non-authenticated requests" do
     test "non-authenticated :show returns 403", %{conn: conn} do
-      conn = post conn, feelings_path(conn, :create), %{feelings: 1}
+      conn = get conn, feelings_path(conn, :show)
       assert text_response(conn, 403)
     end
 

@@ -25,6 +25,9 @@ defmodule FeelingsmotronWeb.Router do
     scope "/v1" do
       pipe_through :api_auth
 
+      get "/profile", ProfileController, :show
+      put "/profile", ProfileController, :update
+
       get "/feelings", FeelingsController, :show
       post "/feelings", FeelingsController, :create
     end
