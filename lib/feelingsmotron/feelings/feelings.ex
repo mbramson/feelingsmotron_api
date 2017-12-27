@@ -116,6 +116,8 @@ defmodule Feelingsmotron.Feelings do
   preloaded.
   """
   @spec create_feeling_with_comment(integer(), integer(), String.t) :: {:ok, %Feeling{}} | {:error, Ecto.Changeset.t | :unhandled}
+  def create_feeling_with_comment(user_id, value, ""),  do: create_feeling(%{user_id: user_id, value: value})
+  def create_feeling_with_comment(user_id, value, nil), do: create_feeling(%{user_id: user_id, value: value})
   def create_feeling_with_comment(user_id, value, comment_text) do
     case create_feeling_with_comment_transaction(user_id, value, comment_text) do
       {:ok, {:ok, feeling}} -> {:ok, feeling}

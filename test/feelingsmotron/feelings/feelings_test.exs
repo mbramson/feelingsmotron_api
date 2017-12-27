@@ -121,6 +121,18 @@ defmodule Feelingsmotron.FeelingsTest do
       assert feeling.comment.text == "very happy"
     end
 
+    test "does not insert a comment if the comment_text is an empty string" do
+      user = insert(:user)
+      assert {:ok, _feeling} = Feelings.create_feeling_with_comment(user.id, 3, "")
+      assert Repo.all(Feelings.Comment) |> length == 0
+    end
+
+    test "does not insert a comment if the comment_text is nil" do
+      user = insert(:user)
+      assert {:ok, _feeling} = Feelings.create_feeling_with_comment(user.id, 3, nil)
+      assert Repo.all(Feelings.Comment) |> length == 0
+    end
+
     test "fails when the user_id is not associated with a user" do
       assert {:error, _changeset} = Feelings.create_feeling_with_comment(999, 3, "very happy")
     end
