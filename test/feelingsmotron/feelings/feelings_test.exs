@@ -44,6 +44,11 @@ defmodule Feelingsmotron.FeelingsTest do
       assert {:error, %Ecto.Changeset{}} = Feelings.create_feeling(@invalid_attrs)
     end
 
+    test "create_feeling/1 with a non-existant user errors" do
+      attrs = Map.merge(@valid_attrs, %{user_id: 999})
+      assert {:error, _} = Feelings.create_feeling(attrs)
+    end
+
     test "create_feeling/1 with invalid feeling values returns error changeset" do
       user = insert(:user)
 
@@ -94,6 +99,35 @@ defmodule Feelingsmotron.FeelingsTest do
       feeling2 = insert(:feeling, %{user: user})
       returned_feeling = Feelings.last_feeling(user)
       assert feeling2.id == returned_feeling.id
+    end
+  end
+
+  describe "create_comment/1" do
+    test "creates a comment" do
+      assert {:ok, comment} = Feelings.create_comment(%{text: "super happy"})
+      assert comment.text == "super happy"
+    end
+  end
+
+  describe "create_feeling_with_comment/3" do
+    test "inserts feeling and associated comment into the database" do
+      user = insert(:user)
+      assert {:ok, feeling} = Feelings.create_feeling_with_comment(user.id, 3, "very happy")
+      assert Repo.all(Feelings.Feeling) |> length == 1
+      assert feeling.value == 3
+
+      assert Repo.all(Feelings.Comment) |> length == 1
+      feeling = feeling |> Repo.preload(:comment)
+      assert feeling.comment.text == "very happy"
+    end
+
+    test "fails when the user_id is not associated with a user" do
+      assert {:error, _changeset} = Feelings.create_feeling_with_comment(999, 3, "very happy")
+    end
+
+    test "rolls back the comment insertion if the feeling insertion fails" do
+      Feelings.create_feeling_with_comment(999, 3, "very happy")
+      assert Repo.all(Feelings.Comment) |> length == 0
     end
   end
 end

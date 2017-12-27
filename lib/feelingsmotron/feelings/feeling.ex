@@ -7,6 +7,7 @@ defmodule Feelingsmotron.Feelings.Feeling do
   schema "feelings" do
     field :value, :integer
     belongs_to :user, Feelingsmotron.Account.User
+    belongs_to :comment, Feelingsmotron.Feelings.Comment
 
     timestamps()
   end
@@ -14,9 +15,11 @@ defmodule Feelingsmotron.Feelings.Feeling do
   @doc false
   def changeset(%Feeling{} = feeling, attrs) do
     feeling
-    |> cast(attrs, [:value, :user_id])
+    |> cast(attrs, [:value, :user_id, :comment_id])
     |> validate_required([:value, :user_id])
     |> validate_value
+    |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:comment_id)
   end
 
   defp validate_value(changeset) do

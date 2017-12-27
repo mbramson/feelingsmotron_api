@@ -7,6 +7,7 @@ defmodule Feelingsmotron.Feelings do
   alias Feelingsmotron.Repo
 
   alias Feelingsmotron.Feelings.Feeling
+  alias Feelingsmotron.Feelings.Comment
 
   @doc """
   Returns the list of feelings.
@@ -98,5 +99,40 @@ defmodule Feelingsmotron.Feelings do
       order_by: [desc: f.inserted_at],
       limit: 1
     Repo.one(query)
+  end
+
+  @doc """
+  Creates a Comment which should be associated with a specific feeling entry.
+  """
+  def create_comment(attrs) do
+    %Comment{}
+    |> Comment.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Creates a Feeling with an associated Comment. Uses a transaction for all
+  database operations. The returned feeling struct does not have the comment
+  preloaded.
+  """
+  @spec create_feeling_with_comment(integer(), integer(), String.t) :: {:ok, %Feeling{}} | {:error, Ecto.Changeset.t | :unhandled}
+  def create_feeling_with_comment(user_id, value, comment_text) do
+    case create_feeling_with_comment_transaction(user_id, value, comment_text) do
+      {:ok, {:ok, feeling}} -> {:ok, feeling}
+      error -> error
+    end
+  end
+
+  @spec create_feeling_with_comment_transaction(integer(), integer(), String.t) :: {:ok, {:ok, %Feeling{}}} | {:error, Ecto.Changeset.t | :unhandled}
+  defp create_feeling_with_comment_transaction(user_id, value, comment_text) do
+    Repo.transaction(fn ->
+      with {:ok, comment} <- create_comment(%{text: comment_text}),
+           {:ok, feeling} <- create_feeling(%{user_id: user_id, value: value, comment_id: comment.id}) do
+        {:ok, feeling}
+      else
+        {:error, changeset} -> Repo.rollback(changeset)
+        _ -> Repo.rollback(:unhandled)
+      end
+    end)
   end
 end
