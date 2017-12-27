@@ -4,6 +4,7 @@ defmodule FeelingsmotronWeb.FeelingsController do
   action_fallback FeelingsmotronWeb.FallbackController
 
   alias Feelingsmotron.Feelings
+  alias Feelingsmotron.Feelings.Comment
 
   def show(conn, _params) do
     current_user = Guardian.Plug.current_resource(conn)
@@ -13,14 +14,23 @@ defmodule FeelingsmotronWeb.FeelingsController do
     |> render("show.json", feelings: last_feeling)
   end
 
-  def create(conn, %{"feelings" => feelings}) do
+  def create(conn, %{"feelings" => value, "comment" => text}) do
     current_user = Guardian.Plug.current_resource(conn)
-    attributes = %{value: feelings, user_id: current_user.id}
+
+    with {:ok, feeling} <- Feelings.create_feeling_with_comment(current_user.id, value, text) do
+      conn
+      |> put_status(:created)
+      |> render("show.json", feelings: feeling.value)
+    end
+  end
+  def create(conn, %{"feelings" => value}) do
+    current_user = Guardian.Plug.current_resource(conn)
+    attributes = %{value: value, user_id: current_user.id}
 
     with {:ok, _changeset} <- Feelings.create_feeling(attributes) do
       conn
       |> put_status(:created)
-      |> render("show.json", feelings: feelings)
+      |> render("show.json", feelings: value)
     end
   end
 end

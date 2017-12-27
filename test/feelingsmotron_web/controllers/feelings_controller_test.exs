@@ -61,6 +61,23 @@ defmodule FeelingsmotronWeb.FeelingsControllerTest do
       conn = post conn, feelings_path(conn, :create), %{feelings: "cats"}
       assert json_response(conn, 422)
     end
+
+    test "adds a new feeling with an associated comment" do
+      {conn, user} = conn_with_authenticated_user()
+      post conn, feelings_path(conn, :create), %{feelings: 1, comment: "happy"}
+
+      assert [feeling | []] = Feelings.list_feelings
+      assert feeling.user_id == user.id
+      feeling = feeling |> Feelingsmotron.Repo.preload(:comment)
+      assert feeling.comment.text == "happy"
+    end
+
+    test "does not add a comment if the comment parameter is blank" do
+      {conn, user} = conn_with_authenticated_user()
+      post conn, feelings_path(conn, :create), %{feelings: 1, comment: ""}
+
+      assert Feelingsmotron.Repo.all(Feelings.Comment) |> length == 0
+    end
   end
 
   describe "non-authenticated requests" do
