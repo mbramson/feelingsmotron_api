@@ -11,6 +11,11 @@ defmodule Feelingsmotron.Groups do
   alias Feelingsmotron.Account
   alias Feelingsmotron.Account.User
 
+  @doc """
+  Returns the group associated with the given id. If no group exists with that
+  id, returns nil.
+  """
+  @spec get_group(integer()) :: Types.group | nil
   def get_group(id), do: Repo.get(Group, id)
 
   @spec list_groups() :: [Types.group]
@@ -18,14 +23,28 @@ defmodule Feelingsmotron.Groups do
     Repo.all(Group)
   end
 
+  @doc """
+  Creates a group with the given user as the owner.
+
+  If the user does not exist, returns an error tuple with an error changeset if
+  the user does not exist or the name is invalid.
+  """
   @spec create_group(String.t, Types.user | integer()) :: {:ok, Types.group} | {:error, Ecto.Changeset.t}
   def create_group(name, %User{} = owner), do: create_group(name, owner.id)
-  def create_group(name, owner_id) when is_binary(name) and is_integer(owner_id) do
+  def create_group(name, owner_id) do
     %Group{}
     |> Group.changeset(%{name: name, owner_id: owner_id})
     |> Repo.insert
   end
 
+  @doc """
+  Deletes a group if the given user is the owner of that group.
+
+  If the user is not the owner of the group, returns the {:error, :forbidden}
+  error tuple.
+
+  If the user or group are not found, returns the {:error, :not_found} tuple.
+  """
   @spec delete_group(Types.group | integer(), Types.user | integer()) :: {:ok, Types.group} | {:error, :forbidden | :not_found}
   def delete_group(group_id, deleting_user) when is_integer(group_id) do
     delete_group(get_group(group_id), deleting_user)

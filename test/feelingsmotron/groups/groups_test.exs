@@ -39,7 +39,16 @@ defmodule Feelingsmotron.GroupsTest do
     end
 
     test "fails if the associated user does not exist" do
-      assert {:error, _} = Groups.create_group("group_name", 999)
+      assert {:error, %Ecto.Changeset{}} = Groups.create_group("group_name", 999)
+    end
+
+    test "fails if the group name is invalid" do
+      user = insert(:user)
+      assert {:error, %Ecto.Changeset{}} = Groups.create_group(999, user)
+    end
+
+    test "fails if the user id is invalid" do
+      assert {:error, %Ecto.Changeset{}} = Groups.create_group("group_name", "invalid")
     end
   end
 
@@ -78,23 +87,20 @@ defmodule Feelingsmotron.GroupsTest do
       assert user_group.group_id == group.id
     end
 
-    test "returns an error if the user does not exist" do
+    test "fails if the user does not exist" do
       group = insert(:group)
-      assert {:error, changeset} = Groups.add_user_to_group(999, group)
-      assert %Ecto.Changeset{} = changeset
+      assert {:error, %Ecto.Changeset{}} = Groups.add_user_to_group(999, group)
     end
 
-    test "returns an error if the group does not exist" do
+    test "fails if the group does not exist" do
       user = insert(:user)
-      assert {:error, changeset} = Groups.add_user_to_group(user, 999)
-      assert %Ecto.Changeset{} = changeset
+      assert {:error, %Ecto.Changeset{}} = Groups.add_user_to_group(user, 999)
     end
 
-    test "returns an error if the user is already in the group" do
+    test "fails if the user is already in the group" do
       user = insert(:user)
       group = insert(:group, %{users: [user]})
-      assert {:error, changeset} = Groups.add_user_to_group(user, group)
-      assert %Ecto.Changeset{} = changeset
+      assert {:error, %Ecto.Changeset{}} = Groups.add_user_to_group(user, group)
     end
   end
 end
