@@ -23,4 +23,18 @@ defmodule Feelingsmotron.Factory do
       user: build(:user),
     }
   end
+
+  def group_factory do
+    %Feelingsmotron.Groups.Group{
+      name: sequence(:name, &"group-#{&1}"),
+      owner: build(:user),
+    }
+  end
+
+  def user_group_factory do
+    %Feelingsmotron.Groups.UserGroup{
+      user: build(:user),
+      group: build(:group),
+    }
+  end
 end

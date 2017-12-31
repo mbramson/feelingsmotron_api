@@ -11,6 +11,8 @@ defmodule Feelingsmotron.Account.User do
     field :password, :string, virtual: true
     field :password_hash, :string
 
+    many_to_many :groups, Feelingsmotron.Groups.Group, join_through: Feelingsmotron.Groups.UserGroup
+
     timestamps()
   end
 

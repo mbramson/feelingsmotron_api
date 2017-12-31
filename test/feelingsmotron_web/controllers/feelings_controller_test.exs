@@ -73,7 +73,7 @@ defmodule FeelingsmotronWeb.FeelingsControllerTest do
     end
 
     test "does not add a comment if the comment parameter is blank" do
-      {conn, user} = conn_with_authenticated_user()
+      {conn, _user} = conn_with_authenticated_user()
       post conn, feelings_path(conn, :create), %{feelings: 1, comment: ""}
 
       assert Feelingsmotron.Repo.all(Feelings.Comment) |> length == 0
