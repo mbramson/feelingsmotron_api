@@ -16,5 +16,6 @@ defmodule Feelingsmotron.Groups.Group do
     group
     |> cast(attrs, [:name, :owner_id])
     |> validate_required([:name, :owner_id])
+    |> foreign_key_constraint(:owner_id)
   end
 end
