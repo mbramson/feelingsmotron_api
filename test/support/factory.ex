@@ -28,6 +28,7 @@ defmodule Feelingsmotron.Factory do
     %Feelingsmotron.Groups.Group{
       name: sequence(:name, &"group-#{&1}"),
       owner: build(:user),
+      users: [],
     }
   end
 

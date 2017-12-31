@@ -3,6 +3,7 @@ defmodule Feelingsmotron.GroupsTest do
 
   alias Feelingsmotron.Groups
   alias Feelingsmotron.Groups.Group
+  alias Feelingsmotron.Groups.UserGroup
 
   describe "get_group/1" do
     test "returns nil when the group does not exist" do
@@ -64,6 +65,36 @@ defmodule Feelingsmotron.GroupsTest do
     test "fails if the group does not exist" do
       user = insert(:group)
       assert {:error, :not_found} = Groups.delete_group(999, user)   
+    end
+  end
+
+  describe "add_user_to_group/2" do
+    test "adds a user to the group" do
+      user = insert(:user)
+      group = insert(:group)
+      assert {:ok, user_group} = Groups.add_user_to_group(user, group)
+      assert %UserGroup{} = user_group
+      assert user_group.user_id == user.id
+      assert user_group.group_id == group.id
+    end
+
+    test "returns an error if the user does not exist" do
+      group = insert(:group)
+      assert {:error, changeset} = Groups.add_user_to_group(999, group)
+      assert %Ecto.Changeset{} = changeset
+    end
+
+    test "returns an error if the group does not exist" do
+      user = insert(:user)
+      assert {:error, changeset} = Groups.add_user_to_group(user, 999)
+      assert %Ecto.Changeset{} = changeset
+    end
+
+    test "returns an error if the user is already in the group" do
+      user = insert(:user)
+      group = insert(:group, %{users: [user]})
+      assert {:error, changeset} = Groups.add_user_to_group(user, group)
+      assert %Ecto.Changeset{} = changeset
     end
   end
 end

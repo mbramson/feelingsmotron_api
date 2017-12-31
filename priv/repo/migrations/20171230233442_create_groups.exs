@@ -17,5 +17,7 @@ defmodule Feelingsmotron.Repo.Migrations.CreateGroups do
 
       timestamps()
     end
+
+    create unique_index(:user_groups, [:user_id, :group_id])
   end
 end
