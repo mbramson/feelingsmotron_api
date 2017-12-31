@@ -24,6 +24,12 @@ defmodule FeelingsmotronWeb.FallbackController do
     |> render(FeelingsmotronWeb.ErrorView, :"404")
   end
 
+  def call(conn, {:error, :forbidden}) do
+    conn
+    |> put_status(:forbidden)
+    |> render(FeelingsmotronWeb.ErrorView, :"403")
+  end
+
   def call(conn, {:error, :invalid_credentials}) do
     conn
     |> put_status(:unauthorized)
