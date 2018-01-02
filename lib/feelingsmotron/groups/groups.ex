@@ -13,10 +13,28 @@ defmodule Feelingsmotron.Groups do
 
   @doc """
   Returns the group associated with the given id. If no group exists with that
-  id, returns nil.
+  id, returns an error tuple of the format `{:error, :not_found}`.
   """
-  @spec get_group(integer()) :: Types.group | nil
-  def get_group(id), do: Repo.get(Group, id)
+  @spec get_group(integer()) :: {:ok, Types.group} | {:error, :not_found}
+  def get_group(id) do
+    case Repo.get(Group, id) do
+      nil -> {:error, :not_found}
+      group -> {:ok, group}
+    end
+  end
+
+  def get_group_with_users(id) do
+    query = from group in Group,
+      left_join: users in assoc(group, :users),
+      left_join: owner in assoc(group, :owner),
+      where: group.id == ^id,
+      preload: [users: users, owner: owner]
+
+    case query |> Repo.one do
+      nil -> {:error, :not_found}
+      group -> {:ok, group}
+    end
+  end
 
   @spec list_all() :: [Types.group]
   def list_all do
@@ -62,6 +80,7 @@ defmodule Feelingsmotron.Groups do
         Repo.delete(group)
     end
   end
+  def delete_group({:error, :not_found}, _user), do: {:error, :not_found}
   def delete_group(nil, _user), do: {:error, :not_found}
   def delete_group(_group, nil), do: {:error, :not_found}
 

@@ -6,14 +6,32 @@ defmodule Feelingsmotron.GroupsTest do
   alias Feelingsmotron.Groups.UserGroup
 
   describe "get_group/1" do
-    test "returns nil when the group does not exist" do
-      assert Groups.get_group(999) == nil
-    end
-
     test "returns the group if it does exist" do
       group = insert(:group)
-      returned_group = Groups.get_group(group.id)
+      assert {:ok, returned_group} = Groups.get_group(group.id)
       assert returned_group.id == group.id
+    end
+
+    test "returns an error tuple when the group does not exist" do
+      assert Groups.get_group(999) == {:error, :not_found}
+    end
+  end
+
+  describe "get_group_with_users/1" do
+    test "returns the group if it does exist" do
+      user_in_group = insert(:user)
+      owner = insert(:user)
+      group = insert(:group, %{owner: owner, users: [user_in_group]})
+
+      assert {:ok, returned_group} = Groups.get_group_with_users(group.id)
+      assert returned_group.id == group.id
+      assert returned_group.owner.id == owner.id
+      assert [returned_user_in_group | []] = returned_group.users
+      assert returned_user_in_group.id == user_in_group.id
+    end
+
+    test "returns an error tuple when the group does not exist" do
+      assert Groups.get_group_with_users(999) == {:error, :not_found}
     end
   end
 
