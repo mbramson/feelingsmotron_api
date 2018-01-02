@@ -17,15 +17,15 @@ defmodule Feelingsmotron.GroupsTest do
     end
   end
 
-  describe "list_groups/0" do
+  describe "list_all/0" do
     test "lists all existing groups" do
-      assert Groups.list_groups() |> length == 0
+      assert Groups.list_all() |> length == 0
 
       insert(:group)
-      assert Groups.list_groups() |> length == 1
+      assert Groups.list_all() |> length == 1
 
       insert(:group)
-      assert Groups.list_groups() |> length == 2
+      assert Groups.list_all() |> length == 2
     end
   end
 

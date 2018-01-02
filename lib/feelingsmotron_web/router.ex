@@ -30,6 +30,8 @@ defmodule FeelingsmotronWeb.Router do
 
       get "/feelings", FeelingsController, :show
       post "/feelings", FeelingsController, :create
+
+      get "/groups", GroupsController, :index
     end
   end
 end

@@ -18,9 +18,11 @@ defmodule Feelingsmotron.Groups do
   @spec get_group(integer()) :: Types.group | nil
   def get_group(id), do: Repo.get(Group, id)
 
-  @spec list_groups() :: [Types.group]
-  def list_groups do
-    Repo.all(Group)
+  @spec list_all() :: [Types.group]
+  def list_all do
+    Group
+    |> order_by(:name)
+    |> Repo.all
   end
 
   @doc """
