@@ -20,6 +20,7 @@ defmodule FeelingsmotronWeb.GroupView do
   def render("group_with_users.json", %{group: group}) do
     %{id: group.id,
       name: group.name,
+      description: group.description,
       owner: render_one(group.owner, UserView, "user.json"),
       users: render_many(group.users, UserView, "user.json")}
   end
