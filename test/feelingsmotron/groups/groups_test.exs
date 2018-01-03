@@ -50,7 +50,8 @@ defmodule Feelingsmotron.GroupsTest do
   describe "create_group/2" do
     test "creates a group with the correct owner" do
       user = insert(:user)
-      assert {:ok, group} = Groups.create_group("group_name", "desc", user)
+      attrs = %{name: "group_name", description: "desc", owner_id: user.id}
+      assert {:ok, group} = Groups.create_group(attrs)
       assert group.owner_id == user.id
       assert group.name == "group_name"
       assert group.description == "desc"
@@ -58,21 +59,25 @@ defmodule Feelingsmotron.GroupsTest do
     end
 
     test "fails if the associated user does not exist" do
-      assert {:error, %Ecto.Changeset{}} = Groups.create_group("group_name", "desc", 999)
+      attrs = %{name: "group_name", description: "desc", owner_id: 999}
+      assert {:error, %Ecto.Changeset{}} = Groups.create_group(attrs)
     end
 
     test "fails if the group name is invalid" do
       user = insert(:user)
-      assert {:error, %Ecto.Changeset{}} = Groups.create_group(999, "desc", user)
+      attrs = %{name: 999, description: "desc", owner_id: user.id}
+      assert {:error, %Ecto.Changeset{}} = Groups.create_group(attrs)
     end
 
     test "fails if the group description is invalid" do
       user = insert(:user)
-      assert {:error, %Ecto.Changeset{}} = Groups.create_group("group_name", 999, user)
+      attrs = %{name: "group_name", description: 999, owner_id: user.id}
+      assert {:error, %Ecto.Changeset{}} = Groups.create_group(attrs)
     end
 
     test "fails if the user id is invalid" do
-      assert {:error, %Ecto.Changeset{}} = Groups.create_group("group_name", "desc", "invalid")
+      attrs = %{name: "group_name", description: "desc", owner_id: "invalid"}
+      assert {:error, %Ecto.Changeset{}} = Groups.create_group(attrs)
     end
   end
 

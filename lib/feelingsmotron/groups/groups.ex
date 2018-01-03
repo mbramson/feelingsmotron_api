@@ -3,7 +3,6 @@ defmodule Feelingsmotron.Groups do
   Contains methods for interacting with schemas related to groups that the user
   can be members of.
   """
-
   import Ecto.Query, warn: false
   alias Feelingsmotron.{Repo, Types}
   alias Feelingsmotron.Groups.Group
@@ -48,12 +47,23 @@ defmodule Feelingsmotron.Groups do
 
   If the user does not exist, returns an error tuple with an error changeset if
   the user does not exist, the name is invalid, or the description is invalid.
+
+  ## Examples
+
+      iex> user_attrs = %{name: "fred", email: "email", password: "1234"}
+      ...> {:ok, user} = Feelingsmotron.Account.create_user(user_attrs)
+      ...> attrs = %{name: "fred's group", owner_id: user.id}
+      ...> Feelingsmotron.Groups.create_group(attrs)
+      {:ok, %Feelingsmotron.Groups.Group{}}
+
+      iex> attrs = %{name: "george's group", owner_id: 999}
+      ...> Feelingsmotron.Groups.create_group(attrs)
+      {:error, Ecto.Changeset{}}
   """
-  @spec create_group(String.t, String.t, Types.user | integer()) :: {:ok, Types.group} | {:error, Ecto.Changeset.t}
-  def create_group(name, description, %User{} = owner), do: create_group(name, description, owner.id)
-  def create_group(name, description, owner_id) do
+  @spec create_group(map()) :: {:ok, Types.group} | {:error, Ecto.Changeset.t}
+  def create_group(attrs) do
     %Group{}
-    |> Group.changeset(%{name: name, description: description, owner_id: owner_id})
+    |> Group.changeset(attrs)
     |> Repo.insert
   end
 

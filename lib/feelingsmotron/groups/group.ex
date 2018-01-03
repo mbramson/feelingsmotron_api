@@ -16,7 +16,7 @@ defmodule Feelingsmotron.Groups.Group do
   def changeset(%Group{} = group, attrs) do
     group
     |> cast(attrs, [:name, :description, :owner_id])
-    |> validate_required([:name, :description, :owner_id])
+    |> validate_required([:name, :owner_id])
     |> foreign_key_constraint(:owner_id)
   end
 end
