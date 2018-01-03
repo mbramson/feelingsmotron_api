@@ -47,13 +47,13 @@ defmodule Feelingsmotron.Groups do
   Creates a group with the given user as the owner.
 
   If the user does not exist, returns an error tuple with an error changeset if
-  the user does not exist or the name is invalid.
+  the user does not exist, the name is invalid, or the description is invalid.
   """
-  @spec create_group(String.t, Types.user | integer()) :: {:ok, Types.group} | {:error, Ecto.Changeset.t}
-  def create_group(name, %User{} = owner), do: create_group(name, owner.id)
-  def create_group(name, owner_id) do
+  @spec create_group(String.t, String.t, Types.user | integer()) :: {:ok, Types.group} | {:error, Ecto.Changeset.t}
+  def create_group(name, description, %User{} = owner), do: create_group(name, description, owner.id)
+  def create_group(name, description, owner_id) do
     %Group{}
-    |> Group.changeset(%{name: name, owner_id: owner_id})
+    |> Group.changeset(%{name: name, description: description, owner_id: owner_id})
     |> Repo.insert
   end
 

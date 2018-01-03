@@ -34,6 +34,7 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
       assert response = json_response(conn, 200)
       assert response["id"] == group.id
       assert response["name"] == group.name
+      assert response["description"] == group.description
     end
 
     test "returns the owner and users of the group" do

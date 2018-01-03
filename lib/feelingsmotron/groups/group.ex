@@ -5,6 +5,7 @@ defmodule Feelingsmotron.Groups.Group do
 
   schema "groups" do
     field :name, :string
+    field :description, :string
     belongs_to :owner, Feelingsmotron.Account.User
     many_to_many :users, Feelingsmotron.Account.User, join_through: Feelingsmotron.Groups.UserGroup
 
@@ -14,8 +15,8 @@ defmodule Feelingsmotron.Groups.Group do
   @doc false
   def changeset(%Group{} = group, attrs) do
     group
-    |> cast(attrs, [:name, :owner_id])
-    |> validate_required([:name, :owner_id])
+    |> cast(attrs, [:name, :description, :owner_id])
+    |> validate_required([:name, :description, :owner_id])
     |> foreign_key_constraint(:owner_id)
   end
 end

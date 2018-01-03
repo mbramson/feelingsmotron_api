@@ -4,6 +4,7 @@ defmodule Feelingsmotron.Repo.Migrations.CreateGroups do
   def change do
     create table(:groups) do
       add :name, :string, null: false
+      add :description, :string
       add :owner_id, references(:users, on_delete: :nilify_all), null: false
 
       timestamps()

@@ -50,23 +50,29 @@ defmodule Feelingsmotron.GroupsTest do
   describe "create_group/2" do
     test "creates a group with the correct owner" do
       user = insert(:user)
-      assert {:ok, group} = Groups.create_group("group_name", user)
+      assert {:ok, group} = Groups.create_group("group_name", "desc", user)
       assert group.owner_id == user.id
       assert group.name == "group_name"
+      assert group.description == "desc"
       assert Repo.all(Groups.Group) |> length == 1
     end
 
     test "fails if the associated user does not exist" do
-      assert {:error, %Ecto.Changeset{}} = Groups.create_group("group_name", 999)
+      assert {:error, %Ecto.Changeset{}} = Groups.create_group("group_name", "desc", 999)
     end
 
     test "fails if the group name is invalid" do
       user = insert(:user)
-      assert {:error, %Ecto.Changeset{}} = Groups.create_group(999, user)
+      assert {:error, %Ecto.Changeset{}} = Groups.create_group(999, "desc", user)
+    end
+
+    test "fails if the group description is invalid" do
+      user = insert(:user)
+      assert {:error, %Ecto.Changeset{}} = Groups.create_group("group_name", 999, user)
     end
 
     test "fails if the user id is invalid" do
-      assert {:error, %Ecto.Changeset{}} = Groups.create_group("group_name", "invalid")
+      assert {:error, %Ecto.Changeset{}} = Groups.create_group("group_name", "desc", "invalid")
     end
   end
 
