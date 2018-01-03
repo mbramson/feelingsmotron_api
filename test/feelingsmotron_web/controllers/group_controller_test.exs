@@ -28,7 +28,7 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
     test "returns a single group" do
       {conn, _user} = conn_with_authenticated_user()
       group = insert(:group)
-      
+
       conn = get conn, group_path(conn, :show, group.id), %{}
 
       assert response = json_response(conn, 200)
@@ -59,6 +59,41 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
       conn = get conn, group_path(conn, :show, 999), %{}
 
       assert %{"errors" => _} = json_response(conn, 404)
+    end
+  end
+
+  describe "create" do
+    test "creates a group with the current user as the owner" do
+      {conn, user} = conn_with_authenticated_user()
+      attrs = %{name: "cat group", description: "group for cats"}
+      conn = post conn, group_path(conn, :create), %{group: attrs}
+
+      assert response = json_response(conn, 200)
+      assert response["name"] == "cat group"
+
+      assert [group | []] = Feelingsmotron.Groups.list_all()
+      assert group.name == "cat group"
+      assert group.description == "group for cats"
+      assert group.owner_id == user.id
+    end
+
+    test "creates a group with the creator as a member" do
+      {conn, user} = conn_with_authenticated_user()
+      attrs = %{name: "cat group", description: "group for cats"}
+      conn = post conn, group_path(conn, :create), %{group: attrs}
+
+      assert response = json_response(conn, 200)
+
+      {:ok, group} = Feelingsmotron.Groups.get_group_with_users(response["id"])
+
+      assert [member | []] = group.users
+      assert member.id == user.id
+    end
+
+    test "returns an error for invalid parameters" do
+      {conn, _user} = conn_with_authenticated_user()
+      conn = post conn, group_path(conn, :create), %{group: %{}}
+      assert %{"errors" => _} = json_response(conn, 422)
     end
   end
 

@@ -43,7 +43,8 @@ defmodule Feelingsmotron.Groups do
   end
 
   @doc """
-  Creates a group with the given user as the owner.
+  Creates a group with the given user as the owner and that user as the only
+  member of the group.
 
   If the user does not exist, returns an error tuple with an error changeset if
   the user does not exist, the name is invalid, or the description is invalid.

@@ -17,6 +17,17 @@ defmodule Feelingsmotron.Groups.Group do
     group
     |> cast(attrs, [:name, :description, :owner_id])
     |> validate_required([:name, :owner_id])
+    |> put_users_assoc_if_present(attrs)
     |> foreign_key_constraint(:owner_id)
   end
+
+  defp put_users_assoc_if_present(%Ecto.Changeset{valid?: false} = changeset, _), do: changeset
+  defp put_users_assoc_if_present(%Ecto.Changeset{} = changeset, %{users: users}) do
+    put_assoc(changeset, :users, users)
+  end
+  defp put_users_assoc_if_present(%Ecto.Changeset{} = changeset, %{"users" => users}) do
+    put_assoc(changeset, :users, users)
+  end
+  defp put_users_assoc_if_present(%Ecto.Changeset{} = changeset, _), do: changeset
+
 end

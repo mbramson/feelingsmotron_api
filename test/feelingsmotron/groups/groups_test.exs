@@ -58,6 +58,19 @@ defmodule Feelingsmotron.GroupsTest do
       assert Repo.all(Groups.Group) |> length == 1
     end
 
+    test "creates a group with the given members in the users parameter" do
+      [owner, member1, member2] = insert_list(3, :user)
+      users = [member1, member2]
+      attrs = %{name: "group_name", description: "desc", owner_id: owner.id, users: users}
+      assert {:ok, group} = Groups.create_group(attrs)
+
+      assert {:ok, group} = Groups.get_group_with_users(group.id)
+      assert group.users |> length == 2
+      assert [returned_user1, returned_user2] = Enum.sort(group.users)
+      assert returned_user1.id == member1.id
+      assert returned_user2.id == member2.id
+    end
+
     test "fails if the associated user does not exist" do
       attrs = %{name: "group_name", description: "desc", owner_id: 999}
       assert {:error, %Ecto.Changeset{}} = Groups.create_group(attrs)
