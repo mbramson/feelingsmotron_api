@@ -19,6 +19,7 @@ defmodule Feelingsmotron.Groups.Group do
     |> validate_required([:name, :owner_id])
     |> put_users_assoc_if_present(attrs)
     |> foreign_key_constraint(:owner_id)
+    |> unique_constraint(:name)
   end
 
   defp put_users_assoc_if_present(%Ecto.Changeset{valid?: false} = changeset, _), do: changeset

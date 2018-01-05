@@ -42,5 +42,6 @@ defmodule FeelingsmotronWeb.FallbackController do
   defp should_render_as_conflict?(%Ecto.Changeset{}), do: false
 
   defp error_is_conflict?({:email, {"has already been taken", _}}), do: true
+  defp error_is_conflict?({:name, {"has already been taken", _}}), do: true
   defp error_is_conflict?(_), do: false
 end
