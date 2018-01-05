@@ -21,8 +21,9 @@ defmodule Feelingsmotron.Account.User do
     user
     |> cast(attrs, [:name, :email, :password])
     |> validate_required([:name, :email, :password])
+    |> validate_length(:password, min: 8)
     |> hash_password
-    |> unique_constraint(:email)
+    |> unique_constraint(:email, message: "is already in use")
   end
 
   @doc """
@@ -34,6 +35,8 @@ defmodule Feelingsmotron.Account.User do
   def profile_changeset(%User{} = user, attrs) do
     user
     |> cast(attrs, [:name, :email, :password])
+    |> validate_required([:name, :email])
+    |> validate_length(:password, min: 8)
     |> hash_password
     |> unique_constraint(:email)
   end
