@@ -94,28 +94,42 @@ defmodule Feelingsmotron.GroupsTest do
     end
   end
 
+  describe "updated_group/2" do
+    test "updates the given group" do
+      group = insert(:group)
+      assert {:ok, updated_group} = Groups.update_group(group, %{name: "new_name"})
+      assert updated_group.name == "new_name"
+      assert Repo.get(Group, group.id).name == "new_name"
+    end
+
+    test "fails if invalid attributes are given" do
+      group = insert(:group)
+      assert {:error, %Ecto.Changeset{}} = Groups.update_group(group, %{name: 999})
+    end
+  end
+
   describe "delete_group/2" do
     test "succeeds when the deleting user is the group owner" do
       owner = insert(:user)
       group = insert(:group, %{owner: owner})
-      assert {:ok, group} = Groups.delete_group(group, owner)   
+      assert {:ok, group} = Groups.delete_group(group, owner)
       assert %Group{} = group
     end
 
     test "fails if the deleting user is not the group owner" do
       not_owner = insert(:user)
       group = insert(:group)
-      assert {:error, :forbidden} = Groups.delete_group(group, not_owner)   
+      assert {:error, :forbidden} = Groups.delete_group(group, not_owner)
     end
 
     test "fails if the deleting user does not exist" do
       group = insert(:group)
-      assert {:error, :not_found} = Groups.delete_group(group, 999)   
+      assert {:error, :not_found} = Groups.delete_group(group, 999)
     end
 
     test "fails if the group does not exist" do
       user = insert(:group)
-      assert {:error, :not_found} = Groups.delete_group(999, user)   
+      assert {:error, :not_found} = Groups.delete_group(999, user)
     end
   end
 

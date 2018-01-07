@@ -68,6 +68,12 @@ defmodule Feelingsmotron.Groups do
     |> Repo.insert
   end
 
+  def update_group(%Group{} = group, attrs) do
+    group
+    |> Group.changeset(attrs)
+    |> Repo.update()
+  end
+
   @doc """
   Deletes a group if the given user is the owner of that group.
 

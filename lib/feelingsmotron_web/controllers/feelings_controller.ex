@@ -4,7 +4,6 @@ defmodule FeelingsmotronWeb.FeelingsController do
   action_fallback FeelingsmotronWeb.FallbackController
 
   alias Feelingsmotron.Feelings
-  alias Feelingsmotron.Feelings.Comment
 
   def show(conn, _params) do
     current_user = Guardian.Plug.current_resource(conn)
