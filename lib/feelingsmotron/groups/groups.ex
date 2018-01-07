@@ -12,9 +12,13 @@ defmodule Feelingsmotron.Groups do
 
   @doc """
   Returns the group associated with the given id. If no group exists with that
-  id, returns an error tuple of the format `{:error, :not_found}`.
+  id, returns an error tuple of the format `{:error, :not_found}`. If an
+  invalid id is given, returns an error tuple of the format {:error,
+  :bad_request}.
   """
-  @spec get_group(integer()) :: {:ok, Types.group} | {:error, :not_found}
+  @spec get_group(integer()) :: {:ok, Types.group} | {:error, :not_found | :bad_request}
+  def get_group(nil), do: {:error, :bad_request}
+  def get_group(""), do: {:error, :bad_request}
   def get_group(id) do
     case Repo.get(Group, id) do
       nil -> {:error, :not_found}
@@ -22,6 +26,7 @@ defmodule Feelingsmotron.Groups do
     end
   end
 
+  @spec get_group_with_users(integer()) :: {:ok, Types.group} | {:error, :not_found}
   def get_group_with_users(id) do
     query = from group in Group,
       left_join: users in assoc(group, :users),

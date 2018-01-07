@@ -12,6 +12,14 @@ defmodule Feelingsmotron.GroupsTest do
       assert returned_group.id == group.id
     end
 
+    test "returns an error tuple when id is nil" do
+      assert Groups.get_group(nil) == {:error, :bad_request}
+    end
+
+    test "returns an error tuple when id is an empty string" do
+      assert Groups.get_group("") == {:error, :bad_request}
+    end
+
     test "returns an error tuple when the group does not exist" do
       assert Groups.get_group(999) == {:error, :not_found}
     end

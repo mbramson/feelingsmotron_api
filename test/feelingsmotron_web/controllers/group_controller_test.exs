@@ -97,9 +97,63 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
     end
   end
 
+  describe "update" do
+    test "updates a group if the current user is the owner" do
+      {conn, user} = conn_with_authenticated_user()
+      group = insert(:group, %{owner: user})
+
+      attrs = %{group: %{"name" => "new_name", "description" => "new_desc"}}
+      conn = put conn, group_path(conn, :update, group.id), attrs
+      assert response = json_response(conn, 200)
+      assert response["name"] == "new_name"
+      assert response["description"] == "new_desc"
+    end
+
+    test "returns a forbidden response if the current user is not the owner" do
+      {conn, _user} = conn_with_authenticated_user()
+      group = insert(:group)
+      
+      attrs = %{group: %{"name" => "new_name", "description" => "new_desc"}}
+      conn = put conn, group_path(conn, :update, group.id), attrs
+      assert json_response(conn, 403)
+    end
+
+    test "returns an error for invalid parameters" do
+      {conn, user} = conn_with_authenticated_user()
+      group = insert(:group, %{owner: user})
+
+      attrs = %{group: %{"name" => ""}}
+      conn = put conn, group_path(conn, :update, group.id), attrs
+      assert %{"errors" => _} = json_response(conn, 422)
+    end
+
+    test "returns a 404 if group does not exist" do
+      {conn, user} = conn_with_authenticated_user()
+
+      attrs = %{group: %{"name" => "new_name", "description" => "new_desc"}}
+      conn = put conn, group_path(conn, :update, 999), attrs
+      assert json_response(conn, 404)
+    end
+  end
+
   describe "non-authenticated requests" do
     test "non-authenticated :index returns 403", %{conn: conn} do
       conn = get conn, group_path(conn, :index), %{}
+      assert text_response(conn, 403)
+    end
+
+    test "non-authenticated :show returns 403", %{conn: conn} do
+      conn = get conn, group_path(conn, :show, 999), %{}
+      assert text_response(conn, 403)
+    end
+
+    test "non-authenticated :create returns 403", %{conn: conn} do
+      conn = post conn, group_path(conn, :create), %{}
+      assert text_response(conn, 403)
+    end
+
+    test "non-authenticated :update returns 403", %{conn: conn} do
+      conn = put conn, group_path(conn, :update, 999), %{}
       assert text_response(conn, 403)
     end
   end

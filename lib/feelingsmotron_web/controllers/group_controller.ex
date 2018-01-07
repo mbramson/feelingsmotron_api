@@ -24,4 +24,22 @@ defmodule FeelingsmotronWeb.GroupController do
     with {:ok, group} <- Groups.create_group(group_params), do:
       render(conn, "group.json", group: group)
   end
+
+  def update(conn, %{"id" => group_id, "group" => group_params}) do
+    current_user = Guardian.Plug.current_resource(conn)
+    with {:ok, group} <- Groups.get_group(group_id),
+         :ok <- validate_allowed_to_update_group(current_user, group),
+         {:ok, group} <- Groups.update_group(group, group_params) do
+      render(conn, "group.json", group: group)
+    end
+  end
+
+  @spec validate_allowed_to_update_group(Types.user, Types.group) :: :ok | {:error, :forbidden}
+  defp validate_allowed_to_update_group(user, group) do
+    if group.owner_id == user.id do
+      :ok
+    else
+      {:error, :forbidden}
+    end
+  end
 end
