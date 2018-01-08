@@ -17,8 +17,7 @@ defmodule Feelingsmotron.GroupsTest do
     end
 
     test "returns an error tuple when id is an empty string" do
-      assert Groups.get_group("") == {:error, :bad_request}
-    end
+      assert Groups.get_group("") == {:error, :bad_request} end
 
     test "returns an error tuple when the group does not exist" do
       assert Groups.get_group(999) == {:error, :not_found}
@@ -166,5 +165,52 @@ defmodule Feelingsmotron.GroupsTest do
       group = insert(:group, %{users: [user]})
       assert {:error, %Ecto.Changeset{}} = Groups.add_user_to_group(user, group)
     end
+  end
+
+  describe "create_group_invitation/3" do
+    test "creates an invitation from the group" do
+      user = insert(:user)
+      group = insert(:group)
+      assert {:ok, invite} = Groups.create_group_invitation(user.id, group.id, true)
+      assert invite.from_group == true
+      assert invite.group_id == group.id
+      assert invite.user_id == user.id
+    end
+
+    test "returns an error if the user doesn't exist" do
+      group = insert(:group)
+      assert {:error, %Ecto.Changeset{}} = Groups.create_group_invitation(999, group.id, true)
+    end
+
+    test "returns an error if the group doesn't exist" do
+      user = insert(:user)
+      assert {:error, %Ecto.Changeset{}} = Groups.create_group_invitation(user.id, 999, true)
+    end
+  end
+
+  describe "user_can_invite_for_group/2" do
+    test "user can invite for group if they are the group's owner" do
+      user = insert(:user)
+      group = insert(:group, %{owner: user})
+      assert :ok = Groups.user_can_invite_for_group(user.id, group)
+    end
+
+    test "group members cannot invite for group if they are not owners" do
+      user = insert(:user)
+      group = insert(:group, %{users: [user]})
+      assert {:error, :forbidden} = Groups.user_can_invite_for_group(user.id, group)
+    end
+
+    test "non associated users cannot invite for group" do
+      user = insert(:user)
+      group = insert(:group)
+      assert {:error, :forbidden} = Groups.user_can_invite_for_group(user.id, group)
+    end
+
+    test "returns error tuple if given non-existent group id" do
+      user = insert(:user)
+      assert {:error, :not_found} = Groups.user_can_invite_for_group(user.id, 999)
+    end
+
   end
 end

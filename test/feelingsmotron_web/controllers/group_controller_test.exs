@@ -128,7 +128,7 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
     end
 
     test "returns a 404 if group does not exist" do
-      {conn, user} = conn_with_authenticated_user()
+      {conn, _user} = conn_with_authenticated_user()
 
       attrs = %{group: %{"name" => "new_name", "description" => "new_desc"}}
       conn = put conn, group_path(conn, :update, 999), attrs

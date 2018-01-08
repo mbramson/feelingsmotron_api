@@ -7,6 +7,7 @@ defmodule Feelingsmotron.Groups do
   alias Feelingsmotron.{Repo, Types}
   alias Feelingsmotron.Groups.Group
   alias Feelingsmotron.Groups.UserGroup
+  alias Feelingsmotron.Groups.Invitation
   alias Feelingsmotron.Account
   alias Feelingsmotron.Account.User
 
@@ -119,5 +120,23 @@ defmodule Feelingsmotron.Groups do
     %UserGroup{}
     |> UserGroup.changeset(%{user_id: user_id, group_id: group_id})
     |> Repo.insert
+  end
+
+  @spec create_group_invitation(integer(), integer(), boolean()) :: {:ok, Types.group_invitation} | {:error, Ecto.Changeset.t}
+  def create_group_invitation(user_id, group_id, from_group) do
+    %Invitation{}
+    |> Invitation.changeset(%{user_id: user_id, group_id: group_id, from_group: from_group})
+    |> Repo.insert
+  end
+
+  @spec user_can_invite_for_group(integer(), integer() | Types.group) :: :ok | {:error, :forbidden | :not_found}
+  def user_can_invite_for_group(user_id, %Group{} = group) do
+    cond do
+      group.owner_id == user_id -> :ok
+      true -> {:error, :forbidden}
+    end
+  end
+  def user_can_invite_for_group(user_id, group_id) do
+    with {:ok, group} <- get_group(group_id), do: user_can_invite_for_group(user_id, group)
   end
 end

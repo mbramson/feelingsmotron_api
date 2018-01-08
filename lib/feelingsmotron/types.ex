@@ -6,4 +6,5 @@ defmodule Feelingsmotron.Types do
   @type user_token :: Feelingsmotron.Account.UserToken
   @type group :: Feelingsmotron.Groups.Group
   @type user_group :: Feelingsmotron.Groups.UserGroup
+  @type group_invitation :: Feelingsmotron.Groups.Invitation
 end
