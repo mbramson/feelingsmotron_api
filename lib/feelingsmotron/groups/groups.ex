@@ -108,12 +108,27 @@ defmodule Feelingsmotron.Groups do
   def delete_group(_group, nil), do: {:error, :not_found}
 
   @doc """
+  Returns the UserGroup record for the given user and group.
+  """
+  @spec get_user_group_by_user_and_group(integer(), integer()) ::
+          {:ok, Types.user_group()}
+          | {:error, :not_found}
+  def get_user_group_by_user_and_group(user_id, group_id) do
+    case Repo.get_by(UserGroup, %{user_id: user_id, group_id: group_id}) do
+      nil -> {:error, :not_found}
+      %UserGroup{} = user_group -> {:ok, user_group}
+    end
+  end
+
+  @doc """
   Adds the user to the specified group.
 
   Returns an error tuple with an error changeset if the user or group don't
   exist or if the user is already in the group.
   """
-  @spec add_user_to_group(Types.user | integer(), Types.group | integer()) :: {:ok, Types.user_group} | {:error, Ecto.Changeset.t}
+  @spec add_user_to_group(Types.user | integer(), Types.group | integer()) ::
+          {:ok, Types.user_group}
+          | {:error, Ecto.Changeset.t}
   def add_user_to_group(%User{} = user, group_id), do: add_user_to_group(user.id, group_id)
   def add_user_to_group(user_id, %Group{} = group), do: add_user_to_group(user_id, group.id)
   def add_user_to_group(user_id, group_id) do
@@ -122,14 +137,23 @@ defmodule Feelingsmotron.Groups do
     |> Repo.insert
   end
 
-  @spec create_group_invitation(integer(), integer(), boolean()) :: {:ok, Types.group_invitation} | {:error, Ecto.Changeset.t}
+  @spec create_group_invitation(integer(), integer(), boolean()) ::
+          {:ok, Types.group_invitation}
+          | {:error, Ecto.Changeset.t}
+          | {:error, {:conflict, binary()}}
   def create_group_invitation(user_id, group_id, from_group) do
-    %Invitation{}
-    |> Invitation.changeset(%{user_id: user_id, group_id: group_id, from_group: from_group})
-    |> Repo.insert
+    case get_user_group_by_user_and_group(user_id, group_id) do
+      {:ok, _} -> {:error, {:conflict, "User already in group"}}
+      {:error, :not_found} ->
+        %Invitation{}
+        |> Invitation.changeset(%{user_id: user_id, group_id: group_id, from_group: from_group})
+        |> Repo.insert
+    end
   end
 
-  @spec user_can_invite_for_group(integer(), integer() | Types.group) :: :ok | {:error, :forbidden | :not_found}
+  @spec user_can_invite_for_group(integer(), integer() | Types.group) ::
+          :ok
+          | {:error, :forbidden | :not_found}
   def user_can_invite_for_group(user_id, %Group{} = group) do
     cond do
       group.owner_id == user_id -> :ok

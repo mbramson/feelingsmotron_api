@@ -140,6 +140,23 @@ defmodule Feelingsmotron.GroupsTest do
     end
   end
 
+  describe "get_user_group_by_user_and_group/2" do
+    test "returns a user group if it exists" do
+      user = insert(:user)
+      group = insert(:group)
+      insert(:user_group, %{user: user, group: group})
+      assert {:ok, user_group}
+        = Groups.get_user_group_by_user_and_group(user.id, group.id)
+
+      assert user_group.user_id == user.id
+      assert user_group.group_id == group.id
+    end
+
+    test "returns an error tuple if the user_group does not exist" do
+      assert {:error, :not_found} = Groups.get_user_group_by_user_and_group(999, 999)
+    end
+  end
+
   describe "add_user_to_group/2" do
     test "adds a user to the group" do
       user = insert(:user)
@@ -186,6 +203,12 @@ defmodule Feelingsmotron.GroupsTest do
       user = insert(:user)
       assert {:error, %Ecto.Changeset{}} = Groups.create_group_invitation(user.id, 999, true)
     end
+
+    test "returns an error if the user is already in the group" do
+      user = insert(:user)
+      group = insert(:group, %{users: [user]})
+      assert {:error, {:conflict, "User already in group"}} = Groups.create_group_invitation(user.id, group.id, true)
+    end
   end
 
   describe "user_can_invite_for_group/2" do
@@ -211,6 +234,5 @@ defmodule Feelingsmotron.GroupsTest do
       user = insert(:user)
       assert {:error, :not_found} = Groups.user_can_invite_for_group(user.id, 999)
     end
-
   end
 end
