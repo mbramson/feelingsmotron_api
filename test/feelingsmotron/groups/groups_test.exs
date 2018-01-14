@@ -218,37 +218,37 @@ defmodule Feelingsmotron.GroupsTest do
     end
   end
 
-  describe "user_can_invite_for_group/2" do
+  describe "user_can_manage_group_membership/2" do
     test "user can invite for group if they are the group's owner" do
       user = insert(:user)
       group = insert(:group, %{owner: user})
-      assert :ok = Groups.user_can_invite_for_group(user.id, group)
+      assert :ok = Groups.user_can_manage_group_membership(user.id, group)
     end
 
     test "group members cannot invite for group if they are not owners" do
       user = insert(:user)
       group = insert(:group, %{users: [user]})
-      assert {:error, :forbidden} = Groups.user_can_invite_for_group(user.id, group)
+      assert {:error, :forbidden} = Groups.user_can_manage_group_membership(user.id, group)
     end
 
     test "non associated users cannot invite for group" do
       user = insert(:user)
       group = insert(:group)
-      assert {:error, :forbidden} = Groups.user_can_invite_for_group(user.id, group)
+      assert {:error, :forbidden} = Groups.user_can_manage_group_membership(user.id, group)
     end
 
     test "returns error tuple if given non-existent group id" do
       user = insert(:user)
-      assert {:error, :not_found} = Groups.user_can_invite_for_group(user.id, 999)
+      assert {:error, :not_found} = Groups.user_can_manage_group_membership(user.id, 999)
     end
 
     test "returns error tuple if user_id or group_id are invalid" do
       user = insert(:user)
       group = insert(:group)
-      assert {:error, :bad_request} = Groups.user_can_invite_for_group("", group.id)
-      assert {:error, :bad_request} = Groups.user_can_invite_for_group(nil, group.id)
-      assert {:error, :bad_request} = Groups.user_can_invite_for_group(user.id, "")
-      assert {:error, :bad_request} = Groups.user_can_invite_for_group(user.id, nil)
+      assert {:error, :bad_request} = Groups.user_can_manage_group_membership("", group.id)
+      assert {:error, :bad_request} = Groups.user_can_manage_group_membership(nil, group.id)
+      assert {:error, :bad_request} = Groups.user_can_manage_group_membership(user.id, "")
+      assert {:error, :bad_request} = Groups.user_can_manage_group_membership(user.id, nil)
     end
   end
 end

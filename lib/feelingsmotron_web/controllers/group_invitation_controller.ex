@@ -10,7 +10,7 @@ defmodule FeelingsmotronWeb.GroupInvitationController do
     %{"user_id" => user_id, "group_id" => group_id, "from_group" => "true"}}) do
 
     current_user = Guardian.Plug.current_resource(conn)
-    with :ok <- Groups.user_can_invite_for_group(current_user.id, group_id),
+    with :ok <- Groups.user_can_manage_group_membership(current_user.id, group_id),
          {:ok, invitation} <- Groups.create_group_invitation(user_id, group_id, true) do
       conn
       |> put_status(:created)

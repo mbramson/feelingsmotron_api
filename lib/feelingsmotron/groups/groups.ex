@@ -187,20 +187,20 @@ defmodule Feelingsmotron.Groups do
     end
   end
 
-  @spec user_can_invite_for_group(integer(), integer() | Types.group) ::
+  @spec user_can_manage_group_membership(integer(), integer() | Types.group) ::
           :ok
           | {:error, :forbidden | :not_found | :bad_request}
-  def user_can_invite_for_group("", _),  do: {:error, :bad_request}
-  def user_can_invite_for_group(nil, _), do: {:error, :bad_request}
-  def user_can_invite_for_group(_, ""),  do: {:error, :bad_request}
-  def user_can_invite_for_group(_, nil), do: {:error, :bad_request}
-  def user_can_invite_for_group(user_id, %Group{} = group) do
+  def user_can_manage_group_membership("", _),  do: {:error, :bad_request}
+  def user_can_manage_group_membership(nil, _), do: {:error, :bad_request}
+  def user_can_manage_group_membership(_, ""),  do: {:error, :bad_request}
+  def user_can_manage_group_membership(_, nil), do: {:error, :bad_request}
+  def user_can_manage_group_membership(user_id, %Group{} = group) do
     cond do
       group.owner_id == user_id -> :ok
       true -> {:error, :forbidden}
     end
   end
-  def user_can_invite_for_group(user_id, group_id) do
-    with {:ok, group} <- get_group(group_id), do: user_can_invite_for_group(user_id, group)
+  def user_can_manage_group_membership(user_id, group_id) do
+    with {:ok, group} <- get_group(group_id), do: user_can_manage_group_membership(user_id, group)
   end
 end
