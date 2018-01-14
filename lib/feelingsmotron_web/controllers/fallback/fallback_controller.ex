@@ -8,13 +8,13 @@ defmodule FeelingsmotronWeb.FallbackController do
 
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     cond do
-      should_render_as_conflict?(changeset) ->
-        conn
-        |> put_status(:conflict)
-        |> render(FeelingsmotronWeb.ChangesetView, "error.json", changeset: changeset)
       should_render_as_not_found?(changeset) ->
         conn
         |> put_status(:not_found)
+        |> render(FeelingsmotronWeb.ChangesetView, "error.json", changeset: changeset)
+      should_render_as_conflict?(changeset) ->
+        conn
+        |> put_status(:conflict)
         |> render(FeelingsmotronWeb.ChangesetView, "error.json", changeset: changeset)
       true ->
         conn
