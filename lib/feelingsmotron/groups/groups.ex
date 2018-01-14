@@ -141,7 +141,12 @@ defmodule Feelingsmotron.Groups do
           {:ok, Types.group_invitation}
           | {:error, Ecto.Changeset.t}
           | {:error, {:conflict, binary()}}
-  def create_group_invitation(user_id, group_id, from_group) do
+          | {:error, :bad_request}
+  def create_group_invitation("", _, _), do:  {:error, :bad_request}
+  def create_group_invitation(nil, _, _), do: {:error, :bad_request}
+  def create_group_invitation(_, "", _), do:  {:error, :bad_request}
+  def create_group_invitation(_, nil, _), do: {:error, :bad_request}
+  def create_group_invitation(user_id, group_id, from_group) when is_boolean(from_group) do
     case get_user_group_by_user_and_group(user_id, group_id) do
       {:ok, _} -> {:error, {:conflict, "User already in group"}}
       {:error, :not_found} ->
@@ -153,7 +158,11 @@ defmodule Feelingsmotron.Groups do
 
   @spec user_can_invite_for_group(integer(), integer() | Types.group) ::
           :ok
-          | {:error, :forbidden | :not_found}
+          | {:error, :forbidden | :not_found | :bad_request}
+  def user_can_invite_for_group("", _),  do: {:error, :bad_request}
+  def user_can_invite_for_group(nil, _), do: {:error, :bad_request}
+  def user_can_invite_for_group(_, ""),  do: {:error, :bad_request}
+  def user_can_invite_for_group(_, nil), do: {:error, :bad_request}
   def user_can_invite_for_group(user_id, %Group{} = group) do
     cond do
       group.owner_id == user_id -> :ok

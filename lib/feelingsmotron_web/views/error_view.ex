@@ -23,6 +23,12 @@ defmodule FeelingsmotronWeb.ErrorView do
         message: "Token is invalid"}}
   end
 
+  def render("409.json", %{message: message}) do
+    %{data: %{
+        status: "error",
+        message: message}}
+  end
+
   def render("410_expired_token.json", _assigns) do
     %{data: %{
         status: "error",

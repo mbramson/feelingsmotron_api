@@ -24,10 +24,10 @@ defmodule FeelingsmotronWeb.FallbackController do
     |> render(FeelingsmotronWeb.ErrorView, :"400")
   end
 
-  def call(conn, {:error, :not_found}) do
+  def call(conn, {:error, :invalid_credentials}) do
     conn
-    |> put_status(:not_found)
-    |> render(FeelingsmotronWeb.ErrorView, :"404")
+    |> put_status(:unauthorized)
+    |> render(FeelingsmotronWeb.ErrorView, :"401_invalid_credentials")
   end
 
   def call(conn, {:error, :forbidden}) do
@@ -36,10 +36,16 @@ defmodule FeelingsmotronWeb.FallbackController do
     |> render(FeelingsmotronWeb.ErrorView, :"403")
   end
 
-  def call(conn, {:error, :invalid_credentials}) do
+  def call(conn, {:error, :not_found}) do
     conn
-    |> put_status(:unauthorized)
-    |> render(FeelingsmotronWeb.ErrorView, :"401_invalid_credentials")
+    |> put_status(:not_found)
+    |> render(FeelingsmotronWeb.ErrorView, :"404")
+  end
+
+  def call(conn, {:error, {:conflict, message}}) when is_binary(message) do
+    conn
+    |> put_status(:conflict)
+    |> render(FeelingsmotronWeb.ErrorView, :"409", message: message)
   end
 
   defp should_render_as_conflict?(%Ecto.Changeset{errors: errors}) do

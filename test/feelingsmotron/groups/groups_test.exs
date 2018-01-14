@@ -209,6 +209,13 @@ defmodule Feelingsmotron.GroupsTest do
       group = insert(:group, %{users: [user]})
       assert {:error, {:conflict, "User already in group"}} = Groups.create_group_invitation(user.id, group.id, true)
     end
+
+    test "returns an error for invalid input" do
+      assert {:error, :bad_request} = Groups.create_group_invitation("", 999, true)
+      assert {:error, :bad_request} = Groups.create_group_invitation(nil, 999, true)
+      assert {:error, :bad_request} = Groups.create_group_invitation(999, "", true)
+      assert {:error, :bad_request} = Groups.create_group_invitation(999, nil, true)
+    end
   end
 
   describe "user_can_invite_for_group/2" do
@@ -233,6 +240,15 @@ defmodule Feelingsmotron.GroupsTest do
     test "returns error tuple if given non-existent group id" do
       user = insert(:user)
       assert {:error, :not_found} = Groups.user_can_invite_for_group(user.id, 999)
+    end
+
+    test "returns error tuple if user_id or group_id are invalid" do
+      user = insert(:user)
+      group = insert(:group)
+      assert {:error, :bad_request} = Groups.user_can_invite_for_group("", group.id)
+      assert {:error, :bad_request} = Groups.user_can_invite_for_group(nil, group.id)
+      assert {:error, :bad_request} = Groups.user_can_invite_for_group(user.id, "")
+      assert {:error, :bad_request} = Groups.user_can_invite_for_group(user.id, nil)
     end
   end
 end
