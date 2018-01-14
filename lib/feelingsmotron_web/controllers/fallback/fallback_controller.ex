@@ -7,14 +7,19 @@ defmodule FeelingsmotronWeb.FallbackController do
   use FeelingsmotronWeb, :controller
 
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
-    if should_render_as_conflict?(changeset) do
-      conn
-      |> put_status(:conflict)
-      |> render(FeelingsmotronWeb.ChangesetView, "error.json", changeset: changeset)
-    else
-      conn
-      |> put_status(:unprocessable_entity)
-      |> render(FeelingsmotronWeb.ChangesetView, "error.json", changeset: changeset)
+    cond do
+      should_render_as_conflict?(changeset) ->
+        conn
+        |> put_status(:conflict)
+        |> render(FeelingsmotronWeb.ChangesetView, "error.json", changeset: changeset)
+      should_render_as_not_found?(changeset) ->
+        conn
+        |> put_status(:not_found)
+        |> render(FeelingsmotronWeb.ChangesetView, "error.json", changeset: changeset)
+      true ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(FeelingsmotronWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
 
@@ -56,4 +61,12 @@ defmodule FeelingsmotronWeb.FallbackController do
   defp error_is_conflict?({:email, {"is already in use", _}}), do: true
   defp error_is_conflict?({:name, {"has already been taken", _}}), do: true
   defp error_is_conflict?(_), do: false
+
+  defp should_render_as_not_found?(%Ecto.Changeset{errors: errors}) do
+    Enum.any?(errors, &(error_is_not_found?(&1)))
+  end
+  defp should_render_as_not_found?(%Ecto.Changeset{}), do: false
+
+  defp error_is_not_found?({_, {"does not exist", _}}), do: true
+  defp error_is_not_found?(_), do: false
 end
