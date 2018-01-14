@@ -33,8 +33,8 @@ defmodule FeelingsmotronWeb.GroupInvitationController do
   @spec validate_same_user(any(), any()) :: :ok | {:error, :forbidden | :not_found}
   defp validate_same_user(same_id, same_id) when is_integer(same_id), do: :ok
   defp validate_same_user(_current_user_id, user_id) when is_integer(user_id) do
-    # We know that the current_user_id is a user since it was retrieved
-    # from the database by Guardian.
+    # We know that the current_user_id is a user since it was presumably
+    # retrieved from the database by Guardian.
     case Account.get_user(user_id) do
       nil -> {:error, :not_found}
       _   -> {:error, :forbidden}
