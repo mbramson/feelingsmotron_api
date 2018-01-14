@@ -12,10 +12,11 @@ defmodule Feelingsmotron.Groups do
   alias Feelingsmotron.Account.User
 
   @doc """
-  Returns the group associated with the given id. If no group exists with that
-  id, returns an error tuple of the format `{:error, :not_found}`. If an
-  invalid id is given, returns an error tuple of the format {:error,
-  :bad_request}.
+  Returns the group associated with the given id.
+
+  If no group exists with that id, returns an error tuple of the format
+  `{:error, :not_found}`. If an invalid id is given, returns an error tuple of
+  the format {:error, :bad_request}.
   """
   @spec get_group(integer()) :: {:ok, Types.group} | {:error, :not_found | :bad_request}
   def get_group(nil), do: {:error, :bad_request}
@@ -27,6 +28,13 @@ defmodule Feelingsmotron.Groups do
     end
   end
 
+  @doc """
+  Returns a group with the the users and owner associations preloaded. If no
+
+  If no group exists with that id, returns an error tuple of the format
+  `{:error, :not_found}`. If an invalid id is given, returns an error tuple of
+  the format {:error, :bad_request}.
+  """
   @spec get_group_with_users(integer()) :: {:ok, Types.group} | {:error, :not_found}
   def get_group_with_users(id) do
     query = from group in Group,
@@ -41,6 +49,9 @@ defmodule Feelingsmotron.Groups do
     end
   end
 
+  @doc """
+  Returns a list of all existing groups.
+  """
   @spec list_all() :: [Types.group]
   def list_all do
     Group
@@ -52,8 +63,8 @@ defmodule Feelingsmotron.Groups do
   Creates a group with the given user as the owner and that user as the only
   member of the group.
 
-  If the user does not exist, returns an error tuple with an error changeset if
-  the user does not exist, the name is invalid, or the description is invalid.
+  Returns an error tuple with an error changeset if the user does not exist,
+  the name is invalid, or the description is invalid.
 
   ## Examples
 
@@ -74,6 +85,12 @@ defmodule Feelingsmotron.Groups do
     |> Repo.insert
   end
 
+  @doc """
+  Updates a group with the given attributes.
+
+  Returns an error tuple with an error changeset if any of the given attributes
+  fail changeset validation.
+  """
   def update_group(%Group{} = group, attrs) do
     group
     |> Group.changeset(attrs)
@@ -137,6 +154,20 @@ defmodule Feelingsmotron.Groups do
     |> Repo.insert
   end
 
+  @doc """
+  Creates a group invitation for the given user and group.
+
+  If the from_user argument is true, then the created group_invitation will
+  behave as if the group invited the user. The user who is invited should be
+  able to accept this invitation and subsequently become a user of the group at
+  which point this group_invitation is destroyed.
+
+  If the from_user argument is false, then the created group_invitation will
+  behaves as if the user requested membership to join the group. The owner of
+  the group or someone with sufficient privileges should be able to accept this
+  request at which point the requesting user becomes a user of the group and
+  this group_invitation is destroyed.
+  """
   @spec create_group_invitation(integer(), integer(), boolean()) ::
           {:ok, Types.group_invitation}
           | {:error, Ecto.Changeset.t}

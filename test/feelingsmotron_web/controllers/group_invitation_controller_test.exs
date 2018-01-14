@@ -70,7 +70,6 @@ defmodule FeelingsmotronWeb.GroupInvitationControllerTest do
       attrs = %{"user_id" => 999, "group_id" => group.id, "from_group" => "true"}
       conn = post conn, group_invitation_path(conn, :create), %{group_invitation: attrs}
 
-
       assert json_response(conn, 404)
     end
 
