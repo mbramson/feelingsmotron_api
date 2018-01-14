@@ -187,6 +187,16 @@ defmodule Feelingsmotron.Groups do
     end
   end
 
+  @doc """
+  Returns a boolean value indicating whether or not the given user is allowed
+  to manage the group membership of the given group.
+
+  Managing the group membership of a group gives the following abilities for
+  that group:
+    - inviting new users to the group
+    - accepting requests for membership in the group from users
+    - removing users from the group
+  """
   @spec user_can_manage_group_membership(integer(), integer() | Types.group) ::
           :ok
           | {:error, :forbidden | :not_found | :bad_request}
