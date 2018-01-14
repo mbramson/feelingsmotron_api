@@ -38,4 +38,12 @@ defmodule Feelingsmotron.Factory do
       group: build(:group),
     }
   end
+
+  def group_invitation_factory do
+    %Feelingsmotron.Groups.Invitation{
+      user: build(:user),
+      group: build(:group),
+      from_group: true,
+    }
+  end
 end

@@ -8,6 +8,7 @@ defmodule Feelingsmotron.Groups.Group do
     field :description, :string
     belongs_to :owner, Feelingsmotron.Account.User
     many_to_many :users, Feelingsmotron.Account.User, join_through: Feelingsmotron.Groups.UserGroup
+    has_many :invitations, Feelingsmotron.Groups.Invitation
 
     timestamps()
   end
