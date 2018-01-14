@@ -28,16 +28,16 @@ defmodule FeelingsmotronWeb.GroupInvitationController do
       |> render("show.json", group_invitation: invitation)
     end
   end
-  def create(conn, _params), do: {:error, :bad_request}
+  def create(_conn, _params), do: {:error, :bad_request}
 
   @spec validate_same_user(any(), any()) :: :ok | {:error, :forbidden | :not_found}
-  defp validate_same_user(id, id) when is_integer(id), do: :ok
-  defp validate_same_user(current_user_id, user_id) do
+  defp validate_same_user(same_id, same_id) when is_integer(same_id), do: :ok
+  defp validate_same_user(_current_user_id, user_id) when is_integer(user_id) do
     # We know that the current_user_id is a user since it was retrieved
     # from the database by Guardian.
     case Account.get_user(user_id) do
       nil -> {:error, :not_found}
-      user -> {:error, :forbidden}
+      _   -> {:error, :forbidden}
     end
   end
   defp validate_same_user(_, _), do: {:error, :forbidden}
