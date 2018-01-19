@@ -54,18 +54,6 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
       assert returned_user_response["name"] == user_in_group.name
     end
 
-    test "returns the invite associated with the current user if it exists" do
-      {conn, user} = conn_with_authenticated_user()
-      group = insert(:group)
-      insert(:group_invitation, %{user: user, group: group, from_group: true})
-
-      conn = get conn, group_path(conn, :show, group.id), %{}
-      assert response = json_response(conn, 200)
-
-      assert [invite | []] = response["invitations"]
-      assert invite["user_id"] == user.id
-    end
-
     test "returns an empty list of groups if none exist" do
       {conn, _user} = conn_with_authenticated_user()
       conn = get conn, group_path(conn, :show, 999), %{}

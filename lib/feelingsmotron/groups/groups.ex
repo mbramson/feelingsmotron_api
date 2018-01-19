@@ -40,10 +40,8 @@ defmodule Feelingsmotron.Groups do
     query = from group in Group,
       left_join: users in assoc(group, :users),
       left_join: owner in assoc(group, :owner),
-      left_join: invitation in assoc(group, :invitations),
-      on: invitation.group_id == ^id and invitation.user_id == ^user_id,
       where: group.id == ^id,
-      preload: [users: users, owner: owner, invitations: invitation]
+      preload: [users: users, owner: owner]
 
     case query |> Repo.one do
       nil -> {:error, :not_found}

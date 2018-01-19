@@ -24,7 +24,6 @@ defmodule FeelingsmotronWeb.GroupView do
       name: group.name,
       description: group.description,
       owner: render_one(group.owner, UserView, "user.json"),
-      users: render_many(group.users, UserView, "user.json"),
-      invitations: render_many(group.invitations, GroupInvitationView, "group_invitation.json")}
+      users: render_many(group.users, UserView, "user.json")}
   end
 end

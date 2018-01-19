@@ -37,29 +37,6 @@ defmodule Feelingsmotron.GroupsTest do
       assert returned_user_in_group.id == user_in_group.id
     end
 
-    test "returns any invites related to the group and user" do
-      invited_user = insert(:user)
-      group = insert(:group)
-      insert(:group_invitation, %{user: invited_user, group: group, from_group: true})
-
-      assert {:ok, returned_group} = Groups.get_group_with_users(group.id, invited_user.id)
-
-      assert [invite | []] = returned_group.invitations
-      assert invite.user_id == invited_user.id
-      assert invite.group_id == group.id
-      assert invite.from_group == true
-    end
-
-    test "does not return any invites related to another user" do
-      invited_user = insert(:user)
-      group = insert(:group)
-      insert(:group_invitation, %{user: invited_user, group: group, from_group: true})
-      not_invited_user = insert(:user)
-
-      assert {:ok, returned_group} = Groups.get_group_with_users(group.id, not_invited_user.id)
-      assert [] = returned_group.invitations
-    end
-
     test "returns an error tuple when the group does not exist" do
       assert Groups.get_group_with_users(999, 999) == {:error, :not_found}
     end
