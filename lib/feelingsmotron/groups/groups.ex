@@ -155,6 +155,23 @@ defmodule Feelingsmotron.Groups do
   end
 
   @doc """
+  Returns all invitations that are associated with the given user id.
+
+  Returns a tuple of the format {:ok, [invitation1, invitation2]} if nothing
+  erroneous is encountered, even if there are no invitations associated with
+  the given user id.
+  """
+  @spec list_users_invitations(integer()) :: {:ok, [Types.group_invitation]}
+  def list_users_invitations(user_id) do
+    query = from invitation in Invitation,
+      left_join: group in assoc(invitation, :group),
+      where: invitation.user_id == ^user_id,
+      preload: [group: group]
+
+    {:ok, Repo.all(query)}
+  end
+
+  @doc """
   Creates a group invitation for the given user and group.
 
   If the from_user argument is true, then the created group_invitation will

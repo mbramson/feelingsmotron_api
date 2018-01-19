@@ -4,6 +4,7 @@ defmodule Feelingsmotron.GroupsTest do
   alias Feelingsmotron.Groups
   alias Feelingsmotron.Groups.Group
   alias Feelingsmotron.Groups.UserGroup
+  alias Feelingsmotron.Groups.Invitation
 
   describe "get_group/1" do
     test "returns the group if it does exist" do
@@ -181,6 +182,28 @@ defmodule Feelingsmotron.GroupsTest do
       user = insert(:user)
       group = insert(:group, %{users: [user]})
       assert {:error, %Ecto.Changeset{}} = Groups.add_user_to_group(user, group)
+    end
+  end
+
+  describe "list_users_invitations/1" do
+    test "returns all invitations associated with a user" do
+      user = insert(:user)
+      insert(:group_invitation, %{user: user, from_group: false})
+      insert(:group_invitation, %{user: user, from_group: true})
+      
+      assert {:ok, [%Invitation{}, %Invitation{}]} = Groups.list_users_invitations(user.id)
+    end
+
+    test "returns an empty list if no invitations are found" do
+      assert {:ok, []} = Groups.list_users_invitations(999)
+    end
+
+    test "does not return another user's invitations" do
+      user = insert(:user)
+      other_user = insert(:user)
+      insert(:group_invitation, %{user: other_user})
+
+      assert {:ok, []} = Groups.list_users_invitations(user.id)
     end
   end
 
