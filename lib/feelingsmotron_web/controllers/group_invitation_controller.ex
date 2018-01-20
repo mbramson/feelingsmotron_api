@@ -6,6 +6,15 @@ defmodule FeelingsmotronWeb.GroupInvitationController do
   alias Feelingsmotron.Account
   alias Feelingsmotron.Groups
 
+  def index(conn, _params) do
+    current_user = Guardian.Plug.current_resource(conn)
+
+    with {:ok, invitations} <- Groups.list_users_invitations(current_user.id) do
+      conn
+      |> render("index.json", group_invitations: invitations)
+    end
+  end
+
   def create(conn, %{"group_invitation" =>
     %{"user_id" => user_id, "group_id" => group_id, "from_group" => "true"}}) do
 
