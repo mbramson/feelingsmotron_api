@@ -204,6 +204,14 @@ defmodule Feelingsmotron.Groups do
     end
   end
 
+  @spec delete_group_invitation(integer()) :: {:ok, Types.invitation()} | {:error, :not_found}
+  def delete_group_invitation(id) do
+    case Repo.get(Invitation, id) do
+      nil -> {:error, :not_found}
+      invitation -> Repo.delete(invitation)
+    end
+  end
+
   @doc """
   Returns a boolean value indicating whether or not the given user is allowed
   to manage the group membership of the given group.

@@ -241,6 +241,18 @@ defmodule Feelingsmotron.GroupsTest do
     end
   end
 
+  describe "delete_group_invitation/1" do
+    test "deletes an invitation" do
+      invitation = insert(:group_invitation)
+      assert {:ok, _deleted_invitation} = Groups.delete_group_invitation(invitation.id)
+      assert [] = Repo.all(Invitation)
+    end
+
+    test "returns an error tuple if the invitation does not exist" do
+      assert {:error, :not_found} = Groups.delete_group_invitation(999)
+    end
+  end
+
   describe "user_can_manage_group_membership/2" do
     test "user can invite for group if they are the group's owner" do
       user = insert(:user)
