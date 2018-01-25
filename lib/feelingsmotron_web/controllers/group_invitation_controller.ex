@@ -47,7 +47,7 @@ defmodule FeelingsmotronWeb.GroupInvitationController do
       |> render("show.json", group_invitation: invitation)
     end
   end
-  def create(_conn, params) do
+  def create(_conn, _params) do
     {:error, :bad_request}
   end
 
@@ -62,4 +62,22 @@ defmodule FeelingsmotronWeb.GroupInvitationController do
     end
   end
   defp validate_same_user(_, _), do: {:error, :forbidden}
+
+  def delete(conn, %{"id" => id}) do
+    current_user = Guardian.Plug.current_resource(conn)
+    with {:ok, invitation} <- Groups.get_invitation_with_group(id),
+         :ok <- validate_current_user_can_delete(invitation, current_user.id),
+         {:ok, deleted_invitation} <- Groups.delete_group_invitation(invitation) do
+      conn
+      |> render("show.json", group_invitation: deleted_invitation)
+    end
+  end
+
+  defp validate_current_user_can_delete(invitation, user_id) do
+    cond do
+      invitation.user_id == user_id -> :ok
+      invitation.group.owner_id == user_id -> :ok
+      true -> {:error, :forbidden}
+    end
+  end
 end

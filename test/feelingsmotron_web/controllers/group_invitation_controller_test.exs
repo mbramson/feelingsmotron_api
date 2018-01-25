@@ -177,6 +177,38 @@ defmodule FeelingsmotronWeb.GroupInvitationControllerTest do
     end
   end
 
+  describe "delete" do
+    test "deletes the group invitation if it is associated with current user" do
+      {conn, user} = conn_with_authenticated_user()
+      invitation = insert(:group_invitation, %{user: user})
+
+      conn = delete conn, group_invitation_path(conn, :delete, invitation.id), %{}
+
+      assert json_response(conn, 200)
+      refute Repo.get(Invitation, invitation.id)
+    end
+
+    test "deletes the group invitation if current user is associated group owner" do
+      {conn, user} = conn_with_authenticated_user()
+      group = insert(:group, %{owner: user})
+      invitation = insert(:group_invitation, %{group: group})
+
+      conn = delete conn, group_invitation_path(conn, :delete, invitation.id), %{}
+
+      assert json_response(conn, 200)
+      refute Repo.get(Invitation, invitation.id)
+    end
+
+    test "does not delete the group invitation if current user is not associated" do
+      {conn, _user} = conn_with_authenticated_user()
+      invitation = insert(:group_invitation)
+
+      conn = delete conn, group_invitation_path(conn, :delete, invitation.id), %{}
+
+      assert json_response(conn, 403)
+    end
+  end
+
   describe "non-authenticated requests" do
     test "non-authenticated :index returns 403", %{conn: conn} do
       conn = get conn, group_invitation_path(conn, :index), %{}
@@ -185,6 +217,11 @@ defmodule FeelingsmotronWeb.GroupInvitationControllerTest do
 
     test "non-authenticated :create returns 403", %{conn: conn} do
       conn = post conn, group_invitation_path(conn, :create), %{}
+      assert text_response(conn, 403)
+    end
+
+    test "non-authenticated :delete returns 403", %{conn: conn} do
+      conn = delete conn, group_invitation_path(conn, :delete, 999), %{}
       assert text_response(conn, 403)
     end
   end
