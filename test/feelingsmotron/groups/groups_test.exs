@@ -31,7 +31,7 @@ defmodule Feelingsmotron.GroupsTest do
       owner = insert(:user)
       group = insert(:group, %{owner: owner, users: [user_in_group]})
 
-      assert {:ok, returned_group} = Groups.get_group_with_users(group.id, 999)
+      assert {:ok, returned_group} = Groups.get_group_with_users(group.id)
       assert returned_group.id == group.id
       assert returned_group.owner.id == owner.id
       assert [returned_user_in_group | []] = returned_group.users
@@ -39,7 +39,7 @@ defmodule Feelingsmotron.GroupsTest do
     end
 
     test "returns an error tuple when the group does not exist" do
-      assert Groups.get_group_with_users(999, 999) == {:error, :not_found}
+      assert Groups.get_group_with_users(999) == {:error, :not_found}
     end
   end
 
@@ -72,7 +72,7 @@ defmodule Feelingsmotron.GroupsTest do
       attrs = %{name: "group_name", description: "desc", owner_id: owner.id, users: users}
       assert {:ok, group} = Groups.create_group(attrs)
 
-      assert {:ok, group} = Groups.get_group_with_users(group.id, 999)
+      assert {:ok, group} = Groups.get_group_with_users(group.id)
       assert group.users |> length == 2
       assert [returned_user1, returned_user2] = Enum.sort(group.users)
       assert returned_user1.id == member1.id

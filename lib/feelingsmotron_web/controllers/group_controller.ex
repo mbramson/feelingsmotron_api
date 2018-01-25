@@ -12,7 +12,7 @@ defmodule FeelingsmotronWeb.GroupController do
 
   def show(conn, %{"id" => id}) do
     current_user = Guardian.Plug.current_resource(conn)
-    with {:ok, group} <- Groups.get_group_with_users(id, current_user.id), do:
+    with {:ok, group} <- Groups.get_group_with_users(id), do:
       render(conn, "show.json", group: group)
   end
 

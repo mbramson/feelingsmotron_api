@@ -35,8 +35,8 @@ defmodule Feelingsmotron.Groups do
   `{:error, :not_found}`. If an invalid id is given, returns an error tuple of
   the format {:error, :bad_request}.
   """
-  @spec get_group_with_users(integer(), integer()) :: {:ok, Types.group} | {:error, :not_found}
-  def get_group_with_users(id, user_id) do
+  @spec get_group_with_users(integer()) :: {:ok, Types.group} | {:error, :not_found}
+  def get_group_with_users(id) do
     query = from group in Group,
       left_join: users in assoc(group, :users),
       left_join: owner in assoc(group, :owner),

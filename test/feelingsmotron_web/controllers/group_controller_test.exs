@@ -84,7 +84,7 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
 
       assert response = json_response(conn, 200)
 
-      {:ok, group} = Feelingsmotron.Groups.get_group_with_users(response["id"], 999)
+      {:ok, group} = Feelingsmotron.Groups.get_group_with_users(response["id"])
 
       assert [member | []] = group.users
       assert member.id == user.id

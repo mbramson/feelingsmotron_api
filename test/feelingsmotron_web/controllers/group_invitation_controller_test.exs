@@ -18,7 +18,7 @@ defmodule FeelingsmotronWeb.GroupInvitationControllerTest do
     end
 
     test "renders a successful response even if no invitations are found" do
-      {conn, user} = conn_with_authenticated_user()
+      {conn, _user} = conn_with_authenticated_user()
       conn = get conn, group_invitation_path(conn, :index), %{}
       assert response = json_response(conn, 200)
       assert [] = response["group_invitations"]
