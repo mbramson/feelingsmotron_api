@@ -205,11 +205,14 @@ defmodule Feelingsmotron.Groups do
   end
 
   @spec delete_group_invitation(integer()) :: {:ok, Types.invitation()} | {:error, :not_found}
-  def delete_group_invitation(id) do
-    case Repo.get(Invitation, id) do
-      nil -> {:error, :not_found}
-      invitation -> Repo.delete(invitation)
-    end
+  def delete_group_invitation(id) when is_integer(id) or is_binary(id) do
+    Invitation
+    |> Repo.get(id)
+    |> delete_group_invitation
+  end
+  def delete_group_invitation(nil), do: {:error, :not_found}
+  def delete_group_invitation(%Invitation{} = invitation) do
+    Repo.delete(invitation)
   end
 
   @doc """
