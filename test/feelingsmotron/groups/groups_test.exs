@@ -207,6 +207,18 @@ defmodule Feelingsmotron.GroupsTest do
     end
   end
 
+  describe "get_invitation_with_group/1" do
+    test "returns the invitation with the group preloaded if it exists" do
+      invitation = insert(:group_invitation)
+      assert {:ok, returned_invitation} = Groups.get_invitation_with_group(invitation.id)
+      assert Ecto.assoc_loaded? returned_invitation.group
+    end
+
+    test "returns an error tuple if the invitation does not exist" do
+      assert {:error, :not_found} = Groups.get_invitation_with_group(999)
+    end
+  end
+
   describe "create_group_invitation/3" do
     test "creates an invitation from the group" do
       user = insert(:user)

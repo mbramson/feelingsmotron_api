@@ -172,6 +172,28 @@ defmodule Feelingsmotron.Groups do
   end
 
   @doc """
+  Returns the invitation associated with the given id, with the group
+  associated preloaded. Only makes one database call.
+
+  Returns a tuple of the format {:ok, invitation} if the invitation exists. If
+  it does not exist, return a tuple of the format {:error, :not_found}
+  """
+  @spec get_invitation_with_group(integer() | binary()) ::
+    {:ok, Types.group_invitation} |
+    {:error, :not_found}
+  def get_invitation_with_group(invitation_id) do
+    query = from invitation in Invitation,
+      left_join: group in assoc(invitation, :group),
+      where: invitation.id == ^invitation_id,
+      preload: [group: group]
+
+    case Repo.one(query) do
+      nil -> {:error, :not_found}
+      invitation -> {:ok, invitation}
+    end
+  end
+
+  @doc """
   Creates a group invitation for the given user and group.
 
   If the from_user argument is true, then the created group_invitation will
