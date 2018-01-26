@@ -269,6 +269,8 @@ defmodule Feelingsmotron.Groups do
   Managing the group membership of a group gives the following abilities for
   that group:
     - inviting new users to the group
+    - rejecting group membership requests
+    - deleting already offered group invitations
     - accepting requests for membership in the group from users
     - removing users from the group
   """
