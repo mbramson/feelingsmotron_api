@@ -238,6 +238,31 @@ defmodule Feelingsmotron.Groups do
   end
 
   @doc """
+  Confirms the given group invitation by adding the associated user to the
+  associated group while also deleting the group invitation in a single
+  transaction.
+  """
+  @spec confirm_group_invitation(integer() | binary()) ::
+    {:ok, any()} |
+    {:error, :not_found | any()} |
+    {:error, atom(), any(), %{optional(atom()) => any()}}
+  def confirm_group_invitation(id) when is_integer(id) or is_binary(id) do
+    Invitation
+    |> Repo.get(id)
+    |> confirm_group_invitation
+  end
+  def confirm_group_invitation(nil), do: {:error, :not_found}
+  def confirm_group_invitation(%Invitation{} = invitation) do
+    user_group_changeset = UserGroup.changeset(%UserGroup{},
+      %{user_id: invitation.user_id, group_id: invitation.group_id})
+
+    Ecto.Multi.new
+    |> Ecto.Multi.delete(:group_invitation, invitation)
+    |> Ecto.Multi.insert(:user_group, user_group_changeset)
+    |> Repo.transaction
+  end
+
+  @doc """
   Returns a boolean value indicating whether or not the given user is allowed
   to manage the group membership of the given group.
 

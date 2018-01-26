@@ -265,6 +265,21 @@ defmodule Feelingsmotron.GroupsTest do
     end
   end
 
+  describe "confirm_group_invitation/1" do
+    test "deletes the invitation and adds the user to the group" do
+      invitation = insert(:group_invitation)
+
+      assert {:ok, _transaction} = Groups.confirm_group_invitation(invitation)
+
+      refute Repo.get(Invitation, invitation.id)
+      assert Repo.get_by(UserGroup, user_id: invitation.user.id, group_id: invitation.group.id)
+    end
+
+    test "returns an error tuple if the invitation does not exist" do
+      assert {:error, :not_found} = Groups.confirm_group_invitation(999)
+    end
+  end
+
   describe "user_can_manage_group_membership/2" do
     test "user can invite for group if they are the group's owner" do
       user = insert(:user)
