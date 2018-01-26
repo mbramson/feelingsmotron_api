@@ -76,7 +76,7 @@ defmodule FeelingsmotronWeb.GroupInvitationController do
   defp validate_current_user_can_delete(invitation, user_id) do
     cond do
       invitation.user_id == user_id -> :ok
-      invitation.group.owner_id == user_id -> :ok
+      Groups.user_can_manage_group_membership(user_id, invitation.group) == :ok -> :ok
       true -> {:error, :forbidden}
     end
   end
