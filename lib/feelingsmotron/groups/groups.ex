@@ -241,6 +241,20 @@ defmodule Feelingsmotron.Groups do
   Confirms the given group invitation by adding the associated user to the
   associated group while also deleting the group invitation in a single
   transaction.
+
+  If the user associated with the invitation is already a member of the group,
+  the invitation will be deleted. This results in two database calls as the
+  first transaction which deletes the invitation and inserts the UserGroup
+  record fails.
+
+  TODO: Specify the return type for the above condition.
+
+  If the original transaction fails but then the second deletion operation
+  fails because the race condition is encountered where the invitation is
+  deleted between the two operations, then this returns an error tuple
+  indicating that no change actually took place
+
+  TODO: Implement the above thing
   """
   @spec confirm_group_invitation(integer() | binary()) ::
     {:ok, any()} |
@@ -256,10 +270,18 @@ defmodule Feelingsmotron.Groups do
     user_group_changeset = UserGroup.changeset(%UserGroup{},
       %{user_id: invitation.user_id, group_id: invitation.group_id})
 
-    Ecto.Multi.new
-    |> Ecto.Multi.delete(:group_invitation, invitation)
-    |> Ecto.Multi.insert(:user_group, user_group_changeset)
-    |> Repo.transaction
+    multi_transaction = Ecto.Multi.new
+      |> Ecto.Multi.delete(:group_invitation, invitation)
+      |> Ecto.Multi.insert(:user_group, user_group_changeset)
+      |> Repo.transaction
+
+    case multi_transaction do
+      {:ok, transaction} -> {:ok, transaction}
+      {:error, :user_group, %{errors: [user_id: {"has already been taken", []}]}, _} ->
+        Repo.delete(invitation)
+      other_result ->
+        IO.inspect other_thing
+    end
   end
 
   @doc """

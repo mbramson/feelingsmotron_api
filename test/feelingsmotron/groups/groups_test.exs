@@ -269,10 +269,19 @@ defmodule Feelingsmotron.GroupsTest do
     test "deletes the invitation and adds the user to the group" do
       invitation = insert(:group_invitation)
 
-      assert {:ok, _transaction} = Groups.confirm_group_invitation(invitation)
+      assert {:ok, %{group_invitation: _, user_group: _}} = Groups.confirm_group_invitation(invitation)
 
       refute Repo.get(Invitation, invitation.id)
       assert Repo.get_by(UserGroup, user_id: invitation.user.id, group_id: invitation.group.id)
+    end
+
+    test "deletes the invitation if the user is already in the group" do
+      invitation = insert(:group_invitation)
+      insert(:user_group, %{user: invitation.user, group: invitation.group})
+
+      assert {:ok, something} = Groups.confirm_group_invitation(invitation)
+
+      refute Repo.get(Invitation, invitation.id)
     end
 
     test "returns an error tuple if the invitation does not exist" do
