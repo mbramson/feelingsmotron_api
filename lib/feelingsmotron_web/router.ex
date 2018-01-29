@@ -38,6 +38,7 @@ defmodule FeelingsmotronWeb.Router do
 
       get "/group_invitations", GroupInvitationController, :index
       post "/group_invitations", GroupInvitationController, :create
+      put "/group_invitations/:id", GroupInvitationController, :update
       delete "/group_invitations/:id", GroupInvitationController, :delete
     end
   end

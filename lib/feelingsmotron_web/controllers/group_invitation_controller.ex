@@ -5,6 +5,7 @@ defmodule FeelingsmotronWeb.GroupInvitationController do
 
   alias Feelingsmotron.Account
   alias Feelingsmotron.Groups
+  alias Feelingsmotron.Groups.Invitation
 
   def index(conn, _params) do
     current_user = Guardian.Plug.current_resource(conn)
@@ -62,6 +63,27 @@ defmodule FeelingsmotronWeb.GroupInvitationController do
     end
   end
   defp validate_same_user(_, _), do: {:error, :forbidden}
+
+  def update(conn, %{"id" => id}) do
+    current_user = Guardian.Plug.current_resource(conn)
+    with {:ok, invitation} <- Groups.get_invitation_with_group(id),
+         {:ok, transaction} <- attempt_to_confirm_invitation(invitation, current_user) do
+      IO.inspect transaction
+      conn
+      |> render("show.json", group_invitation: invitation)
+    end
+  end
+
+  defp attempt_to_confirm_invitation(%Invitation{from_group: true} = invitation, current_user) do
+    with :ok <- validate_same_user(current_user.id, invitation.user_id) do
+      Groups.confirm_group_invitation(invitation)
+    end
+  end
+  defp attempt_to_confirm_invitation(%Invitation{from_group: false} = invitation, current_user) do
+    with :ok <- validate_same_user(current_user.id, invitation.user_id) do
+      Groups.confirm_group_invitation(invitation)
+    end
+  end
 
   def delete(conn, %{"id" => id}) do
     current_user = Guardian.Plug.current_resource(conn)

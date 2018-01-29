@@ -3,6 +3,7 @@ defmodule FeelingsmotronWeb.GroupInvitationControllerTest do
 
   alias Feelingsmotron.Repo
   alias Feelingsmotron.Groups.Invitation
+  alias Feelingsmotron.Groups.UserGroup
 
   describe "index" do
     test "renders a list of invitations with the group information" do
@@ -174,6 +175,20 @@ defmodule FeelingsmotronWeb.GroupInvitationControllerTest do
       conn = post conn, group_invitation_path(conn, :create), %{group_invitation: attrs}
 
       assert json_response(conn, 404)
+    end
+  end
+
+  describe "update when invitation is from the group" do
+    test "deletes the invitation and adds the user to the group if current user is that user" do
+      {conn, user} = conn_with_authenticated_user()
+      invitation = insert(:group_invitation, %{user: user, from_group: true})
+
+      conn = put conn, group_invitation_path(conn, :update, invitation.id), %{}
+
+      assert json_response(conn, 200)
+
+      refute Repo.get(Invitation, invitation.id)
+      assert Repo.get_by(UserGroup, %{user_id: user.id, group_id: invitation.group.id})
     end
   end
 
