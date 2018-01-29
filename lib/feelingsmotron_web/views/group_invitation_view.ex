@@ -3,6 +3,7 @@ defmodule FeelingsmotronWeb.GroupInvitationView do
 
   alias FeelingsmotronWeb.GroupInvitationView
   alias FeelingsmotronWeb.GroupView
+  alias FeelingsmotronWeb.UserGroupView
 
   def render("index.json", %{group_invitations: invitations}) do
     %{group_invitations: render_many(invitations, GroupInvitationView, "group_invitation_with_group.json")}
@@ -25,5 +26,10 @@ defmodule FeelingsmotronWeb.GroupInvitationView do
       group: render_one(invitation.group, GroupView, "group.json"),
       group_id: invitation.group_id,
       from_group: invitation.from_group}
+  end
+
+  def render("update.json", %{transaction: %{group_invitation: invitation, user_group: user_group}}) do
+    %{group_invitation: render_one(invitation, GroupInvitationView, "group_invitation.json"),
+      user_group: render_one(user_group, UserGroupView, "user_group.json")}
   end
 end

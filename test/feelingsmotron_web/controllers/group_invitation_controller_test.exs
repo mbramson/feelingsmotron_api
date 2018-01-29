@@ -185,7 +185,12 @@ defmodule FeelingsmotronWeb.GroupInvitationControllerTest do
 
       conn = put conn, group_invitation_path(conn, :update, invitation.id), %{}
 
-      assert json_response(conn, 200)
+      assert response = json_response(conn, 200)
+      assert response["group_invitation"]["id"] == invitation.id
+      assert response["group_invitation"]["group_id"] == invitation.group_id
+      assert response["group_invitation"]["user_id"] == invitation.user_id
+      assert response["user_group"]["user_id"] == invitation.user_id
+      assert response["user_group"]["group_id"] == invitation.group_id
 
       refute Repo.get(Invitation, invitation.id)
       assert Repo.get_by(UserGroup, %{user_id: user.id, group_id: invitation.group.id})

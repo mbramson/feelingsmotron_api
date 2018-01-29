@@ -6,6 +6,7 @@ defmodule FeelingsmotronWeb.GroupInvitationController do
   alias Feelingsmotron.Account
   alias Feelingsmotron.Groups
   alias Feelingsmotron.Groups.Invitation
+  alias FeelingsmotronWeb.UserGroupView
 
   def index(conn, _params) do
     current_user = Guardian.Plug.current_resource(conn)
@@ -68,9 +69,8 @@ defmodule FeelingsmotronWeb.GroupInvitationController do
     current_user = Guardian.Plug.current_resource(conn)
     with {:ok, invitation} <- Groups.get_invitation_with_group(id),
          {:ok, transaction} <- attempt_to_confirm_invitation(invitation, current_user) do
-      IO.inspect transaction
       conn
-      |> render("show.json", group_invitation: invitation)
+      |> render("update.json", transaction: transaction)
     end
   end
 
