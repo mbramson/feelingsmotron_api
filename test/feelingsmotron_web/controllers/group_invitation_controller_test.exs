@@ -220,10 +220,73 @@ defmodule FeelingsmotronWeb.GroupInvitationControllerTest do
       assert json_response(conn, 403)
     end
 
+    test "fails if the invitation is not associated with current user even when they are the group owner" do
+      {conn, user} = conn_with_authenticated_user()
+      group = insert(:group, %{owner: user})
+      invitation = insert(:group_invitation, %{group: group, from_group: true})
+
+      conn = put conn, group_invitation_path(conn, :update, invitation.id), %{}
+      assert json_response(conn, 403)
+    end
+
     test "fails if the invitation does not exist" do
       {conn, _user} = conn_with_authenticated_user()
       conn = put conn, group_invitation_path(conn, :update, 999), %{}
       assert json_response(conn, 404)
+    end
+  end
+
+  describe "update when invitation is from the user" do
+    test "deletes the invitation and adds the user to the group if current user is group owner" do
+      {conn, user} = conn_with_authenticated_user()
+      group = insert(:group, %{owner: user})
+      invitation = insert(:group_invitation, %{group: group, from_group: false})
+
+      conn = put conn, group_invitation_path(conn, :update, invitation.id), %{}
+
+      assert response = json_response(conn, 200)
+      assert response["group_invitation"]["id"] == invitation.id
+      assert response["group_invitation"]["group_id"] == invitation.group_id
+      assert response["group_invitation"]["user_id"] == invitation.user_id
+      assert response["user_group"]["user_id"] == invitation.user_id
+      assert response["user_group"]["group_id"] == invitation.group_id
+
+      refute Repo.get(Invitation, invitation.id)
+      assert Repo.get_by(UserGroup, %{user_id: invitation.user.id, group_id: group.id})
+    end
+
+    test "deletes the invitation and adds the user even if user already in group" do
+      {conn, user} = conn_with_authenticated_user()
+      group = insert(:group, %{owner: user})
+      invitation = insert(:group_invitation, %{group: group, from_group: false})
+      insert(:user_group, %{user: invitation.user, group: group})
+
+      conn = put conn, group_invitation_path(conn, :update, invitation.id), %{}
+
+      assert response = json_response(conn, 200)
+      assert response["group_invitation"]["id"] == invitation.id
+      assert response["group_invitation"]["group_id"] == invitation.group_id
+      assert response["group_invitation"]["user_id"] == invitation.user_id
+      assert response["user_group"]["user_id"] == invitation.user_id
+      assert response["user_group"]["group_id"] == invitation.group_id
+
+      refute Repo.get(Invitation, invitation.id)
+    end
+
+    test "fails if the current user does not own the group" do
+      {conn, _user} = conn_with_authenticated_user()
+      invitation = insert(:group_invitation, %{from_group: false})
+      conn = put conn, group_invitation_path(conn, :update, invitation.id), %{}
+
+      assert json_response(conn, 403)
+    end
+    
+    test "fails if the current user does not own the group even if they are the user on the invitation" do
+      {conn, user} = conn_with_authenticated_user()
+      invitation = insert(:group_invitation, %{user: user, from_group: false})
+      conn = put conn, group_invitation_path(conn, :update, invitation.id), %{}
+
+      assert json_response(conn, 403)
     end
   end
 

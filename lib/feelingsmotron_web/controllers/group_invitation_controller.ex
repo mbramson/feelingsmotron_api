@@ -80,7 +80,7 @@ defmodule FeelingsmotronWeb.GroupInvitationController do
     end
   end
   defp attempt_to_confirm_invitation(%Invitation{from_group: false} = invitation, current_user) do
-    with :ok <- validate_same_user(current_user.id, invitation.user_id) do
+    with :ok <- Groups.user_can_manage_group_membership(current_user.id, invitation.group) do
       Groups.confirm_group_invitation(invitation)
     end
   end
