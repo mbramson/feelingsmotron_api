@@ -190,7 +190,7 @@ defmodule Feelingsmotron.GroupsTest do
       user = insert(:user)
       insert(:group_invitation, %{user: user, from_group: false})
       insert(:group_invitation, %{user: user, from_group: true})
-      
+
       assert {:ok, [%Invitation{}, %Invitation{}]} = Groups.list_users_invitations(user.id)
     end
 
@@ -279,7 +279,7 @@ defmodule Feelingsmotron.GroupsTest do
       invitation = insert(:group_invitation)
       insert(:user_group, %{user: invitation.user, group: invitation.group})
 
-      assert {:ok, something} = Groups.confirm_group_invitation(invitation)
+      assert {:ok, %{group_invitation: _, user_group: _}} = Groups.confirm_group_invitation(invitation)
 
       refute Repo.get(Invitation, invitation.id)
     end

@@ -196,14 +196,6 @@ defmodule FeelingsmotronWeb.GroupInvitationControllerTest do
       assert Repo.get_by(UserGroup, %{user_id: user.id, group_id: invitation.group.id})
     end
 
-    test "fails if the invitation is not associated with current user" do
-      {conn, _user} = conn_with_authenticated_user()
-      invitation = insert(:group_invitation, %{from_group: true})
-
-      conn = put conn, group_invitation_path(conn, :update, invitation.id), %{}
-      assert json_response(conn, 403)
-    end
-
     test "deletes the invitation if the user is already in the group" do
       {conn, user} = conn_with_authenticated_user()
       invitation = insert(:group_invitation, %{user: user, from_group: true})
@@ -211,8 +203,21 @@ defmodule FeelingsmotronWeb.GroupInvitationControllerTest do
 
       conn = put conn, group_invitation_path(conn, :update, invitation.id), %{}
       assert response = json_response(conn, 200)
+      assert response["group_invitation"]["id"] == invitation.id
+      assert response["group_invitation"]["group_id"] == invitation.group_id
+      assert response["group_invitation"]["user_id"] == invitation.user_id
+      assert response["user_group"]["user_id"] == invitation.user_id
+      assert response["user_group"]["group_id"] == invitation.group_id
 
       refute Repo.get(Invitation, invitation.id)
+    end
+
+    test "fails if the invitation is not associated with current user" do
+      {conn, _user} = conn_with_authenticated_user()
+      invitation = insert(:group_invitation, %{from_group: true})
+
+      conn = put conn, group_invitation_path(conn, :update, invitation.id), %{}
+      assert json_response(conn, 403)
     end
 
     test "fails if the invitation does not exist" do
