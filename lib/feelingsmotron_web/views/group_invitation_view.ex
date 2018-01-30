@@ -32,8 +32,4 @@ defmodule FeelingsmotronWeb.GroupInvitationView do
     %{group_invitation: render_one(invitation, GroupInvitationView, "group_invitation.json"),
       user_group: render_one(user_group, UserGroupView, "user_group.json")}
   end
-  #def render("update.json", params) do
-    #IO.inspect params
-    #%{}
-  #end
 end
