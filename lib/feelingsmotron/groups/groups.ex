@@ -248,6 +248,14 @@ defmodule Feelingsmotron.Groups do
   record fails. This will return a map with the deleted invitation, and the
   already existing UserGroup record. This is o that the API when this situation
   occurs is identical.
+
+  There are two race conditions in this function:
+  - If the group_invitation is deleted by another process after the multi
+  transaction fails and before this function tries to delete it, then this will
+  raise an error.
+  - If the multi transaction fails because the user is already in the group,
+  but the user_group record is deleted before it is retrieved, then this
+  function will return {:error, :not_found}.
   """
   @spec confirm_group_invitation(integer() | binary()) ::
     {:ok, any()} |
