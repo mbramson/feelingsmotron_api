@@ -105,8 +105,9 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
       attrs = %{group: %{"name" => "new_name", "description" => "new_desc"}}
       conn = put conn, group_path(conn, :update, group.id), attrs
       assert response = json_response(conn, 200)
-      assert response["name"] == "new_name"
-      assert response["description"] == "new_desc"
+      assert response["group"]["id"] == group.id
+      assert response["group"]["name"] == "new_name"
+      assert response["group"]["description"] == "new_desc"
     end
 
     test "returns a forbidden response if the current user is not the owner" do

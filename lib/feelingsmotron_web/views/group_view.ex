@@ -3,13 +3,16 @@ defmodule FeelingsmotronWeb.GroupView do
 
   alias FeelingsmotronWeb.GroupView
   alias FeelingsmotronWeb.UserView
-  alias FeelingsmotronWeb.GroupInvitationView
 
   def render("index.json", %{groups: groups}) do
     %{groups: render_many(groups, GroupView, "group.json")}
   end
 
   def render("show.json", %{group: group}) do
+    %{group: render_one(group, GroupView, "group.json")}
+  end
+
+  def render("show_with_users.json", %{group: group}) do
     render_one(group, GroupView, "group_with_users.json")
   end
 
