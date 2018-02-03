@@ -13,7 +13,7 @@ defmodule FeelingsmotronWeb.GroupView do
   end
 
   def render("show_with_users.json", %{group: group}) do
-    render_one(group, GroupView, "group_with_users.json")
+    %{group: render_one(group, GroupView, "group_with_users.json")}
   end
 
   def render("group.json", %{group: group}) do

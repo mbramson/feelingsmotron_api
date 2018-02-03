@@ -32,9 +32,9 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
       conn = get conn, group_path(conn, :show, group.id), %{}
 
       assert response = json_response(conn, 200)
-      assert response["id"] == group.id
-      assert response["name"] == group.name
-      assert response["description"] == group.description
+      assert response["group"]["id"] == group.id
+      assert response["group"]["name"] == group.name
+      assert response["group"]["description"] == group.description
     end
 
     test "returns the owner and users of the group" do
@@ -46,10 +46,10 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
       conn = get conn, group_path(conn, :show, group.id), %{}
 
       assert response = json_response(conn, 200)
-      assert response["owner"]["id"] == owner.id
-      assert response["owner"]["name"] == owner.name
+      assert response["group"]["owner"]["id"] == owner.id
+      assert response["group"]["owner"]["name"] == owner.name
 
-      assert [returned_user_response | []] = response["users"]
+      assert [returned_user_response | []] = response["group"]["users"]
       assert returned_user_response["id"] == user_in_group.id
       assert returned_user_response["name"] == user_in_group.name
     end
