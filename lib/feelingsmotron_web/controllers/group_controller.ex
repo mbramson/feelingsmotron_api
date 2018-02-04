@@ -11,7 +11,6 @@ defmodule FeelingsmotronWeb.GroupController do
   end
 
   def show(conn, %{"id" => id}) do
-    current_user = Guardian.Plug.current_resource(conn)
     with {:ok, group} <- Groups.get_group_with_users(id), do:
       render(conn, "show_with_users.json", group: group)
   end
@@ -41,6 +40,14 @@ defmodule FeelingsmotronWeb.GroupController do
       :ok
     else
       {:error, :forbidden}
+    end
+  end
+
+  def delete(conn, %{"id" => id}) do
+    current_user = Guardian.Plug.current_resource(conn)
+    with {:ok, group} <- Groups.get_group(id),
+         {:ok, deleted_group} <- Groups.delete_group(group, current_user) do
+      render(conn, "show.json", group: deleted_group)
     end
   end
 end

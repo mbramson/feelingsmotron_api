@@ -1,6 +1,9 @@
 defmodule FeelingsmotronWeb.GroupControllerTest do
   use FeelingsmotronWeb.ConnCase
 
+  alias Feelingsmotron.Repo
+  alias Feelingsmotron.Groups.Group
+
   describe "index" do
     test "lists the groups that exist ordered by name" do
       {conn, _user} = conn_with_authenticated_user()
@@ -137,6 +140,43 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
     end
   end
 
+  describe "delete" do
+    test "owner of the group can delete the group" do
+      {conn, user} = conn_with_authenticated_user()
+      group = insert(:group, %{owner: user})
+
+      conn = delete conn, group_path(conn, :delete, group.id), %{}
+
+      assert response = json_response(conn, 200)
+      assert response["group"]["id"] == group.id
+      refute Repo.get(Group, group.id)
+    end
+
+    test "non-owner user in the group cannot delete the group" do
+      {conn, user} = conn_with_authenticated_user()
+      group = insert(:group, %{users: [user]})
+      conn = delete conn, group_path(conn, :delete, group.id), %{}
+
+      assert json_response(conn, 403)
+      assert Repo.get(Group, group.id)
+    end
+
+    test "user not in group cannot delete the group" do
+      {conn, _user} = conn_with_authenticated_user()
+      group = insert(:group)
+      conn = delete conn, group_path(conn, :delete, group.id), %{}
+
+      assert json_response(conn, 403)
+      assert Repo.get(Group, group.id)
+    end
+
+    test "fails if the group does not exist" do
+      {conn, _user} = conn_with_authenticated_user()
+      conn = delete conn, group_path(conn, :delete, 999), %{}
+      assert json_response(conn, 404)
+    end
+  end
+
   describe "non-authenticated requests" do
     test "non-authenticated :index returns 403", %{conn: conn} do
       conn = get conn, group_path(conn, :index), %{}
@@ -155,6 +195,11 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
 
     test "non-authenticated :update returns 403", %{conn: conn} do
       conn = put conn, group_path(conn, :update, 999), %{}
+      assert text_response(conn, 403)
+    end
+
+    test "non-authenticated :delete returns 403", %{conn: conn} do
+      conn = delete conn, group_path(conn, :delete, 999), %{}
       assert text_response(conn, 403)
     end
   end
