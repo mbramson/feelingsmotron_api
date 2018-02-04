@@ -3,7 +3,6 @@ defmodule FeelingsmotronWeb.ProfileController do
 
   action_fallback FeelingsmotronWeb.FallbackController
 
-  alias Feelingsmotron.Feelings
   alias Feelingsmotron.Account
 
   def show(conn, _params) do
