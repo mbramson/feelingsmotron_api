@@ -23,7 +23,7 @@ defmodule FeelingsmotronWeb.GroupController do
       |> Map.put("users", [current_user])
 
     with {:ok, group} <- Groups.create_group(group_params), do:
-      render(conn, "group.json", group: group)
+      render(conn, "show.json", group: group)
   end
 
   def update(conn, %{"id" => group_id, "group" => group_params}) do

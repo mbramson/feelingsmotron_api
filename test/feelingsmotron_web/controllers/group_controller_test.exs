@@ -69,7 +69,7 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
       conn = post conn, group_path(conn, :create), %{group: attrs}
 
       assert response = json_response(conn, 200)
-      assert response["name"] == "cat group"
+      assert response["group"]["name"] == "cat group"
 
       assert [group | []] = Feelingsmotron.Groups.list_all()
       assert group.name == "cat group"
@@ -84,7 +84,7 @@ defmodule FeelingsmotronWeb.GroupControllerTest do
 
       assert response = json_response(conn, 200)
 
-      {:ok, group} = Feelingsmotron.Groups.get_group_with_users(response["id"])
+      {:ok, group} = Feelingsmotron.Groups.get_group_with_users(response["group"]["id"])
 
       assert [member | []] = group.users
       assert member.id == user.id
